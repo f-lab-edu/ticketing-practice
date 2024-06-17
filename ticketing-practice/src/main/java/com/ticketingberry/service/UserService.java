@@ -18,11 +18,11 @@ public class UserService {
 	private PasswordEncoder passwordEncoder;
 	
 	// 회원 가입
-	public User addUser(String username, String password, String name, String email, 
+	public User addUser(String username, String password, String nickname, String email, 
 						String phone, String birth, String gender, String role) {
 		User user = new User();
 		user.setUsername(username);
-		user.setName(name);
+		user.setNickname(nickname);
 		user.setEmail(email);
 		user.setPhone(phone);
 		user.setBirth(birth);

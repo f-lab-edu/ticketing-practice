@@ -15,7 +15,7 @@ public class UserCreateForm {
 	
 	private String password2;	// password1과 password2 일치 체크 -> UserController의 join 함수에서 함
 	
-	private String name;
+	private String nickname;
 
 	private String email;
 	
@@ -25,7 +25,7 @@ public class UserCreateForm {
 	
 	private String gender;
 	
-	private String role = "회원";
+	private String role = "회원";	// 회원가입하는 모든 사람들은 회원 권한을 가짐
 }
 
 

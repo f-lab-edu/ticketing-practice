@@ -46,7 +46,7 @@ public class UserController {
 		}
 		
 		try {
-			userService.addUser(userCreateForm.getUsername(), userCreateForm.getPassword1(), userCreateForm.getName(), userCreateForm.getEmail(),
+			userService.addUser(userCreateForm.getUsername(), userCreateForm.getPassword1(), userCreateForm.getNickname(), userCreateForm.getEmail(),
 					userCreateForm.getPhone(), userCreateForm.getBirth(), userCreateForm.getGender(), userCreateForm.getRole());
 		} catch (DataIntegrityViolationException e) {	// 중복 객체가 들어오면 다시 회원가입 화면으로 돌아감
 			e.printStackTrace();

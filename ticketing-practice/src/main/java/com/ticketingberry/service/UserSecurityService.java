@@ -36,10 +36,10 @@ public class UserSecurityService implements UserDetailsService {
 		
 		if ("관리자".equals(user.getRole())) {
 			// 관리자(ADMIN) 권한을 얻어서 내장 권한 클래스 리스트에 넣음
-			authorities.add(new SimpleGrantedAuthority(UserRole.ADMIN.getValue()));	// 관리자 권한 부여
+			authorities.add(new SimpleGrantedAuthority(UserRole.ADMIN.getRole()));	// 관리자 권한 부여
 		} else {
 			// 회원(USER) 권한을 얻어서 내장 권한 클래스 리스트에 넣음
-			authorities.add(new SimpleGrantedAuthority(UserRole.USER.getValue()));	// 회원 권한 부여
+			authorities.add(new SimpleGrantedAuthority(UserRole.USER.getRole()));	// 회원 권한 부여
 		}
 		
 		// 자바 내장 클래스 User

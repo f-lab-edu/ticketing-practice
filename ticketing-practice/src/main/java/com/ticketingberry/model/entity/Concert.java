@@ -7,9 +7,11 @@ import org.springframework.stereotype.Component;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import lombok.Getter;
@@ -19,40 +21,42 @@ import lombok.Setter;
 @Setter
 @Entity
 @Component
-public class Concert {
+public class Concert {	// 콘서트(공연) 테이블
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column
-	private int id;
+	@Column(name = "concert_id", nullable = false)
+	private long id;		// 공연 고유 id (1부터 자동 증가)
 	
-	@ManyToOne
-	private Place place;
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Place place;		// 공연이 열리는 장소
 	
-	@ManyToOne
-	private Artist artist;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "artist_id")
+	private Artist performer;	// 공연을 진행하는 아티스트
 	
-	@ManyToOne
-	private User user;
-	
-	@OneToOne
-	private Img img;
+	@OneToOne(fetch = FetchType.LAZY)
+	private Image image;		// 공연 대표 이미지
 	
 	@Column(length = 200, nullable = false)
-	private String title;
+	private String title;		// 공연 제목
 	
 	@Column(length = 5000, nullable = false)
-	private String content;
+	private String content;		// 공연 내용
 	
 	@Column(nullable = false)
-	private int view = 0;
+	private long hits = 0;		// 공연 조회수
 	
 	@Column(nullable = false)
-	private LocalDateTime openedTicketDate;
+	private LocalDateTime openedTicketAt;	// 공연 예매가 열리는 시간
 	
 	@Column(nullable = false)
-	private LocalDateTime performedDate;
+	private LocalDateTime performedAt;		// 공연이 시작하는 시간	
 	
 	@CreationTimestamp
 	@Column(nullable = false)
-	private LocalDateTime createdDate;
+	private LocalDateTime createdAt;	// 공연 객체 생성 시간
+	
+	@CreationTimestamp
+	@Column(nullable = false)
+	private LocalDateTime updatedAt;	// 공연 객체 수정 시간
 }

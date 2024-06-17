@@ -8,9 +8,9 @@ public enum UserRole {
 	ADMIN("ROLE_ADMIN"),	// 관리자
 	USER("ROLE_USER");		// 일반 사용자
 	
-	private String value;
+	private String role;
 	
-	UserRole(String value) {
-		this.value = value;
+	UserRole(String role) {
+		this.role = role;
 	}
 }
