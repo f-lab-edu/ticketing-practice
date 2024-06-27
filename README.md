@@ -18,4 +18,4 @@
 - 사용자 프로필, 공연, 게시판에 사진을 삽입할 수 있다.
 - 관리자는 개발자 혼자이고, 회원가입을 새로 하는 모든 사람들은 일반 사용자이다.
 
-![티켓팅 연습 웹 ERD](https://github.com/f-lab-edu/ticketing-practice/assets/39743375/4ee86f60-5b5b-4111-b8a5-136638f28803)
+![티켓팅 연습 웹 ERD](https://github.com/f-lab-edu/ticketing-practice/assets/39743375/5219f8f8-6868-4eaa-9b91-0b118780f8a1)
