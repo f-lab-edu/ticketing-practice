@@ -7,7 +7,9 @@
 #3 Gradle로 수정, Spring REST Docs 세팅, User의 API와 기능 구현
 
 - 회원가입
+
 POST /api/users
+
 - 모든 회원 검색 
 GET /api/users
 - 회원 1명 검색 
