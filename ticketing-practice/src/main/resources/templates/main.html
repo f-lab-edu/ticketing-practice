@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>티켓팅베리</title>
+</head>
+<body>
+	<div align="center">
+	    <h1>메인화면</h1>
+		<h2 sec:authorize="isAuthenticated()">[[${nickname}]]님 안녕하세요!</h2>
+	    <a sec:authorize="isAnonymous()" th:href="@{/api/users/login}">로그인</a>
+	    <a sec:authorize="isAuthenticated()" th:href="@{/api/logout}">로그아웃</a>
+	    <a sec:authorize="isAnonymous()" th:href="@{/api/users/join}">회원가입</a>
+	</div>
+</body>
+</html>
