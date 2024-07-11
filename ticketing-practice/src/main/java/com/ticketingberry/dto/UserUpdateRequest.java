@@ -1,4 +1,4 @@
-package com.ticketingberry.model;
+package com.ticketingberry.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -9,11 +9,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserUpdateForm {	
+public class UserUpdateRequest {
 	@NotNull(message = "닉네임을 입력해주세요.")
 	@Size(min = 1, max = 25, message = "닉네임을 1 ~ 8자 사이로 입력해주세요.")
 	private String nickname;
-
+	
 	@NotNull(message = "이메일을 입력해주세요.")
 	@Email(message = "유효한 이메일 주소를 입력해주세요.")
 	private String email;
