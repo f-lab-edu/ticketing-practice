@@ -5,3 +5,4 @@ public class DataNotFoundException extends RuntimeException {
 		super(message);
 	}
 }
+

@@ -21,3 +21,4 @@ public class HttpStatusResponseEntity {
 	// 409(충돌): 서버가 요청을 수행하는 중에 충돌이 발생하였다.
 	public static final ResponseEntity<HttpStatus> RESPONSE_CONFLICT = ResponseEntity.status(HttpStatus.CONFLICT).build();
 }
+

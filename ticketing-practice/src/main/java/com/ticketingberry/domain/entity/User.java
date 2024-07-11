@@ -84,9 +84,11 @@ public class User {		// 회원 테이블
 	@LastModifiedDate
 	private LocalDateTime updatedAt;	// 회원 객체 수정 시간
 	
+	// 특정 필드만 수정하는 메서드
 	public void update(String nickname, String email, String phone) {
 		this.nickname = nickname;
 		this.email = email;
 		this.phone = phone;
 	}
 }
+

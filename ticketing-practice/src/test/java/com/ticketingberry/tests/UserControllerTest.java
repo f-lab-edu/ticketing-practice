@@ -429,7 +429,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 //		Long reservationId = 1L;
 //		
 //		when(userService.readUser(userId)).thenReturn(user);
-//		doNothing().when(userService).deleteReservation(reservationId);	// 예매 삭제 시 아무 동작도 하지 않도록 하기
+//		doNothing().when(reservationService).deleteReservation(reservationId);	// 예매 삭제 시 아무 동작도 하지 않도록 하기
 //		
 //		// API 호출 및 테스트
 //		mockMvc.perform(delete("/api/users/{userId}/reservations/{reservationId}", 1, 1))

@@ -3,7 +3,6 @@ package com.ticketingberry.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,13 +13,15 @@ import org.springframework.stereotype.Service;
 import com.ticketingberry.domain.entity.User;
 import com.ticketingberry.domain.repository.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+
 import static com.ticketingberry.domain.UserRole.*;
 
 @Service
+@RequiredArgsConstructor
 // UserDetailsService: DB에서 인증정보 획득
 public class UserSecurityService implements UserDetailsService {
-	@Autowired
-	private UserRepository userRepository;
+	private final UserRepository userRepository;
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -47,17 +48,3 @@ public class UserSecurityService implements UserDetailsService {
 		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

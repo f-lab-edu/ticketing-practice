@@ -5,3 +5,4 @@ public class DuplicatedExcpetion extends RuntimeException {
 		super(message);
 	}
 }
+

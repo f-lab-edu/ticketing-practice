@@ -14,7 +14,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserDto {
+public class UserDto {	// 회원 생성 DTO
 	@NotNull(message = "사용자 아이디를 입력해주세요.")
 	@Size(min = 7, max = 20, message = "사용자 아이디를 7 ~ 20자 사이로 입력해주세요.")
 	private String username;	// 중복 체크
@@ -48,6 +48,7 @@ public class UserDto {
 	
 	private UserRole role = UserRole.USER;	// 회원가입하는 모든 사람들은 회원 권한을 가짐
 	
+	// 엔티티 생성 정적 메서드
 	public static User toEntity(UserDto userDTO, PasswordEncoder passwordEncoder) {
 		return User.builder()
 				.username(userDTO.getUsername())
@@ -61,9 +62,3 @@ public class UserDto {
 				.build();
 	}
 }
-
-
-
-
-
-

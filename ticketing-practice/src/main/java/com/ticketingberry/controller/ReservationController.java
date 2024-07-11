@@ -34,3 +34,4 @@ public class ReservationController {
 		return ResponseEntity.status(HttpStatus.OK).body("예매(id: " + reservationId + ") 취소에 성공했습니다.");
 	}
 }
+
