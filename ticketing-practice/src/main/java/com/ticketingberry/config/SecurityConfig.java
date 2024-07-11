@@ -30,7 +30,7 @@ public class SecurityConfig {
 		authorizeHttpRequest.requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
 		.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
 		.csrf((csrf) -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/**")))
-		.formLogin((formLogin) -> formLogin.loginPage("/user/login").defaultSuccessUrl("/main"))
+		.formLogin((formLogin) -> formLogin.loginPage("/api/user/login").defaultSuccessUrl("/main"))
 		.logout((logout) -> logout.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
 		.logoutSuccessUrl("/main").invalidateHttpSession(true));
 		return http.build();
