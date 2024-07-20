@@ -1,4 +1,4 @@
-package com.ticketingberry.tests;
+package com.ticketingberry.controller.common;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 
@@ -26,13 +26,13 @@ public class AbstractRestDocsTests {
 	protected RestDocumentationResultHandler restDocs;
 	
 	@Autowired
-	protected MockMvc mockMvc;
+	protected MockMvc mockMvc;	// HTTP 요청을 시뮬레이션하여 로직 테스트
 	
 	@BeforeEach
 	public void setUp(
 			final WebApplicationContext context,
 			final RestDocumentationContextProvider restDocumentation) {
-		this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
+		mockMvc = MockMvcBuilders.webAppContextSetup(context)
 				.apply(documentationConfiguration(restDocumentation))
 				.alwaysDo(MockMvcResultHandlers.print())
 				.alwaysDo(restDocs)
