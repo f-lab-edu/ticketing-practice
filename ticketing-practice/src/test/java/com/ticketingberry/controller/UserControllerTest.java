@@ -1,45 +1,35 @@
-package com.ticketingberry.tests;
+package com.ticketingberry.controller;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+
+import static com.ticketingberry.domain.UserRole.*;
 
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ticketingberry.controller.UserController;
-import com.ticketingberry.domain.UserRole;
-import com.ticketingberry.domain.entity.Article;
-import com.ticketingberry.domain.entity.ArticleComment;
-import com.ticketingberry.domain.entity.Artist;
-import com.ticketingberry.domain.entity.ArtistWishlist;
-import com.ticketingberry.domain.entity.Board;
-import com.ticketingberry.domain.entity.Concert;
-import com.ticketingberry.domain.entity.ConcertComment;
-import com.ticketingberry.domain.entity.ConcertWishlist;
-import com.ticketingberry.domain.entity.District;
-import com.ticketingberry.domain.entity.Place;
-import com.ticketingberry.domain.entity.Reservation;
-import com.ticketingberry.domain.entity.Seat;
-import com.ticketingberry.domain.entity.User;
+import com.ticketingberry.advice.ExceptionAdvice;
+import com.ticketingberry.controller.common.AbstractRestDocsTests;
+import com.ticketingberry.domain.entity.*;
 import com.ticketingberry.dto.UserDto;
-import com.ticketingberry.dto.UserUpdateRequest;
+import com.ticketingberry.dto.UpdateUserDto;
 import com.ticketingberry.service.UserService;
 
 //앞에서 작성한 API에 대해 테스트 코드를 작성한다.
@@ -49,6 +39,7 @@ import com.ticketingberry.service.UserService;
 //하지만 이렇게 하면 description과 type에 대한 내용은 명시할 수 없기 때문에 필요에 따라 잘 사용하면 될 것 같다.
 
 @WebMvcTest(UserController.class)	// UserController만 로드
+@Import(ExceptionAdvice.class)
 public class UserControllerTest extends AbstractRestDocsTests {
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -59,8 +50,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	private User user;
 	
 	@BeforeEach
-	public void setUp(WebApplicationContext context) {
-		//MockitoAnnotations.openMocks(this);
+	void setUp(WebApplicationContext context) {
 		user = User.builder()
 				.id(1L)
 				.username("testuser")
@@ -70,14 +60,14 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				.phone("01012345678")
 				.birth("20000101")
 				.gender("F")
-				.role(UserRole.USER)
+				.role(USER)
 				.createdAt(LocalDateTime.now())
 				.build();
 	}
 	
-	// 회원 가입
 	@Test
-	public void createUser() throws Exception {
+	@DisplayName("회원 가입")
+	void createUser() throws Exception {
 		UserDto userDto = new UserDto();
 		userDto.setUsername("testuser");
 		userDto.setPassword1("testpassword");
@@ -95,13 +85,37 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				.andExpect(status().isCreated());
 	}
 	
-	// 전체 회원 목록 조회
+//	@Test
+//	@DisplayName("회원 가입: 비밀번호와 비밀번호 확인이 다르면 400(BadRequest) 응답")
+//	void createUser_whenPasswordsDoNotMatch_throwsBadRequest() throws Exception {
+//		UserDto userDto = new UserDto();
+//		userDto.setUsername("testuser");
+//		userDto.setPassword1("password");
+//		userDto.setPassword2("differentPassword");
+//		userDto.setNickname("테스트");
+//		userDto.setEmail("testuser@example.com");
+//		userDto.setPhone("01012345678");
+//		userDto.setBirth("20000101");
+//		userDto.setGender("F");
+//		
+//		// 모킹된 UserService에서 PasswordsDoNotMatchException을 던지도록 설정
+//		when(userService.createUser(userDto)).thenThrow(new PasswordsDoNotMatchException("비밀번호와 비밀번호 확인이 다릅니다."));
+//		
+//		// API 호출 및 테스트
+//		mockMvc.perform(post("/api/users")
+//				.contentType(MediaType.APPLICATION_JSON)
+//				.content(objectMapper.writeValueAsString(userDto)))
+//				.andExpect(status().isBadRequest())
+//				.andExpect(content().json("{\"error\":\"비밀번호와 비밀번호 확인이 다릅니다.\"}"));
+//	}
+	
 	@Test
-	public void readAllUsers() throws Exception {
+	@DisplayName("전체 회원 목록 조회")
+	void readAllUsers() throws Exception {
 		List<User> users = List.of(user,
 				User.builder().id(2L).username("testuser2").password("testpassword")
 				.nickname("테스트2").email("testuser2@example.com").phone("01098765432")
-				.birth("20010101").gender("M").role(UserRole.USER)
+				.birth("20010101").gender("M").role(USER)
 				.createdAt(LocalDateTime.now()).build());
 		
 		// UserService의 Mock 객체에 대해 readAllUsers 메서드 호출 시 반환 값 설정
@@ -127,8 +141,8 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	}
 	
 	@Test
-	// 회원 1명 조회
-	public void readUser() throws Exception {
+	@DisplayName("회원 1명 조회")
+	void readUser() throws Exception {
 		Long userId = 1L;
 		
 		// UserService의 Mock 객체에 대해 readUser 메서드 호출 시 반환 값 설정
@@ -151,12 +165,12 @@ public class UserControllerTest extends AbstractRestDocsTests {
 		// 문서화는 상위 클래스에서 자동으로 처리됨
 	}
 	
-	// 회원 정보 수정
 	@Test
-	public void updateUser() throws Exception {
+	@DisplayName("회원 정보 수정")
+	void updateUser() throws Exception {
 		Long userId = 1L;
 		
-		UserUpdateRequest userUpdateRequest = new UserUpdateRequest();
+		UpdateUserDto userUpdateRequest = new UpdateUserDto();
 		userUpdateRequest.setNickname("updateduser");
 		userUpdateRequest.setEmail("updateduser@example.com");
 		userUpdateRequest.setPhone("01098765432");
@@ -168,9 +182,9 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				.andExpect(status().isOk());
 	}
 	
-	// 회원 탈퇴
 	@Test
-	public void deleteUser() throws Exception {
+	@DisplayName("회원 탈퇴")
+	void deleteUser() throws Exception {
 		Long userId = 1L;
 		
 		when(userService.readUser(userId)).thenReturn(user);
@@ -180,9 +194,9 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				.andExpect(status().isOk());
 	}
 	
-	// 회원 1명이 작성한 게시글 목록 조회
 	@Test
-	public void readArticlesByUserId() throws Exception {		
+	@DisplayName("회원 1명이 작성한 게시글 목록 조회")
+	void readArticlesByUserId() throws Exception {		
 		Long userId = 1L;
 		
 		Board board = Board.builder().id(1L).name("자유게시판").build();
@@ -216,9 +230,9 @@ public class UserControllerTest extends AbstractRestDocsTests {
 		assertEquals("자유게시판", articleList.get(0).getBoard().getName());	// 게시글이 속한 게시판 검증
 	}
 	
-	// 회원 1명이 작성한 게시글 댓글 목록 조회
 	@Test
-	public void readArticleCommentsByUserId() throws Exception {	
+	@DisplayName("회원 1명이 작성한 게시글 댓글 목록 조회")
+	void readArticleCommentsByUserId() throws Exception {	
 		Long userId = 1L;
 		
 		Board board = Board.builder().id(1L).name("자유게시판").build();
@@ -254,19 +268,19 @@ public class UserControllerTest extends AbstractRestDocsTests {
 		assertEquals("게시글 댓글의 내용입니다.", articleCommentList.get(0).getContent());	// 게시글 댓글 내용 검증
 	}
 	
-	// 회원 1명이 작성한 콘서트 댓글 목록 조회
 	@Test
-	public void readConcertCommentsByUserId() throws Exception {
+	@DisplayName("회원 1명이 작성한 콘서트 댓글 목록 조회")
+	void readConcertCommentsByUserId() throws Exception {
 		Long userId = 1L;
 		
-		Place place = Place.builder().id(1L).name("KSPO DOME (올림픽체조경기장)")
+		Place place = Place.builder().id(1L).name("KSPO DOME")
 				.createdAt(LocalDateTime.now()).build();
 		
-		Artist artist = Artist.builder().id(1L).name("엔하이픈")
+		Artist artist = Artist.builder().id(1L).name("아이유")
 				.createdAt(LocalDateTime.now()).build();
 		
 		Concert concert = Concert.builder().id(1L).place(place).artist(artist)
-				.title("FATE TOUR").content("콘서트의 내용입니다.").hits(0)
+				.title("IU Concert").content("아이유 콘서트의 내용입니다.").hits(0)
 				.performedAt(LocalDateTime.of(2024, Month.FEBRUARY, 25, 17, 00))
 				.createdAt(LocalDateTime.now()).build();
 		
@@ -295,22 +309,22 @@ public class UserControllerTest extends AbstractRestDocsTests {
 		assertFalse(concertCommentList.isEmpty());	// 콘서트 댓글 리스트가 비어있지 않은지 확인
 		assertEquals("콘서트의 댓글입니다.", concertCommentList.get(0).getContent());	// 콘서트 댓글 내용 검증
 		assertEquals("테스트", concertCommentList.get(0).getUser().getNickname());	// 콘서트 댓글 작성자 검증
-		assertEquals("FATE TOUR", concertCommentList.get(0).getConcert().getTitle());	// 댓글이 속한 콘서트 제목 검증
+		assertEquals("IU Concert", concertCommentList.get(0).getConcert().getTitle());	// 댓글이 속한 콘서트 제목 검증
 	}
 	
-	// 회원 1명의 콘서트 찜 목록 조회
 	@Test
-	public void readConcertWishlistsByUserId() throws Exception {
+	@DisplayName("회원 1명의 콘서트 찜 목록 조회")
+	void readConcertWishlistsByUserId() throws Exception {
 		Long userId = 1L;
 		
-		Place place = Place.builder().id(1L).name("KSPO DOME (올림픽체조경기장)")
+		Place place = Place.builder().id(1L).name("KSPO DOME")
 				.createdAt(LocalDateTime.now()).build();
 		
-		Artist artist = Artist.builder().id(1L).name("엔하이픈")
+		Artist artist = Artist.builder().id(1L).name("아이유")
 				.createdAt(LocalDateTime.now()).build();
 		
 		Concert concert = Concert.builder().id(1L).place(place).artist(artist)
-				.title("FATE TOUR").content("콘서트의 내용입니다.").hits(0)
+				.title("IU Concert").content("아이유 콘서트의 내용입니다.").hits(0)
 				.performedAt(LocalDateTime.of(2024, Month.FEBRUARY, 25, 17, 00))
 				.createdAt(LocalDateTime.now()).build();
 		
@@ -336,15 +350,15 @@ public class UserControllerTest extends AbstractRestDocsTests {
 		// 가져온 데이터에 대한 검증을 추가
 		assertFalse(concertWishlistList.isEmpty());	// 콘서트 찜 리스트가 비어있지 않은지 확인
 		assertEquals("테스트", concertWishlistList.get(0).getUser().getNickname());	// 콘서트 찜의 소유자 검증
-		assertEquals("FATE TOUR", concertWishlistList.get(0).getConcert().getTitle());	// 찜한 콘서트 제목 검증
+		assertEquals("IU Concert", concertWishlistList.get(0).getConcert().getTitle());	// 찜한 콘서트 제목 검증
 	}
 	
 	@Test
-	// 회원 1명의 아티스트 찜 목록 조회
-	public void readArtistWishlistsByUserId() throws Exception {
+	@DisplayName("회원 1명의 아티스트 찜 목록 조회")
+	void readArtistWishlistsByUserId() throws Exception {
 		Long userId = 1L;
 		
-		Artist artist = Artist.builder().id(1L).name("엔하이픈")
+		Artist artist = Artist.builder().id(1L).name("아이유")
 				.createdAt(LocalDateTime.now()).build();
 		
 		List<ArtistWishlist> artistWishlists = List.of(
@@ -369,22 +383,22 @@ public class UserControllerTest extends AbstractRestDocsTests {
 		// 가져온 데이터에 대한 검증을 추가
 		assertFalse(artistWishlistList.isEmpty());	// 아티스트 찜 리스트가 비어있지 않은지 확인
 		assertEquals("테스트", artistWishlistList.get(0).getUser().getNickname());	// 아티스트 찜의 소유자 검증
-		assertEquals("엔하이픈", artistWishlistList.get(0).getArtist().getName());	// 찜한 아티스트 검증
+		assertEquals("아이유", artistWishlistList.get(0).getArtist().getName());	// 찜한 아티스트 검증
 	}
 	
 	@Test
-	// 회원 1명이 예매한 공연 목록 조회
-	public void readReservationsByUserId() throws Exception {
+	@DisplayName("회원 1명이 예매한 공연 목록 조회")
+	void readReservationsByUserId() throws Exception {
 		Long userId = 1L;
 		
-		Place place = Place.builder().id(1L).name("KSPO DOME (올림픽체조경기장)")
+		Place place = Place.builder().id(1L).name("KSPO DOME")
 				.createdAt(LocalDateTime.now()).build();
 		
-		Artist artist = Artist.builder().id(1L).name("엔하이픈")
+		Artist artist = Artist.builder().id(1L).name("아이유")
 				.createdAt(LocalDateTime.now()).build();
 		
 		Concert concert = Concert.builder().id(1L).place(place).artist(artist)
-				.title("FATE TOUR").content("콘서트의 내용입니다.").hits(0)
+				.title("IU Concert").content("아이유 콘서트의 내용입니다.").hits(0)
 				.performedAt(LocalDateTime.of(2024, Month.FEBRUARY, 25, 17, 00))
 				.createdAt(LocalDateTime.now()).build();
 		
@@ -419,7 +433,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 		assertEquals(1, reservationList.get(0).getSeat().getSeatNum());			// 예약한 자리 번호 검증
 		assertEquals(1, reservationList.get(0).getSeat().getRowNum());			// 예약한 열 번호 검증
 		assertEquals("A", reservationList.get(0).getSeat().getDistrict().getDistrictName());		// 예약한 구역 이름 검증
-		assertEquals("FATE TOUR", reservationList.get(0).getSeat().getDistrict().getConcert().getTitle());	// 예약한 콘서트 이름 검증
+		assertEquals("IU Concert", reservationList.get(0).getSeat().getDistrict().getConcert().getTitle());	// 예약한 콘서트 이름 검증
 	}
 	
 //	@Test
