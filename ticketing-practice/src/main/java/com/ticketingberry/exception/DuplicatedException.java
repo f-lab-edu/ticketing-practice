@@ -1,7 +1,11 @@
 package com.ticketingberry.exception;
 
-public class DuplicatedExcpetion extends RuntimeException {
-	public DuplicatedExcpetion(String message) {
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ResponseStatus(HttpStatus.CONFLICT)	// 409 상태코드
+public class DuplicatedException extends RuntimeException {
+	public DuplicatedException(String message) {
 		super(message);
 	}
 }
