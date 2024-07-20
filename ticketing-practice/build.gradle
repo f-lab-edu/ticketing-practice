@@ -48,7 +48,8 @@ dependencies {
 	// adoc 파일에서 사용할 snippets 속성이 자동으로 build/generated-snippets를 가리키도록 해준다.
 	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'	
 	// (4) MockMvc를 사용하여 테스트할 예정이기 때문에 spring-resetdocs-mockmvc도 dependencies에 추가해준다.
-	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'	
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+	testImplementation 'org.mockito:mockito-core:4.0.0'
 }
 
 ext {
