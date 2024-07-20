@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserUpdateRequest {	// 회원 수정 DTO
+public class UpdateUserDto {	// 회원 수정 DTO
 	@NotNull(message = "닉네임을 입력해주세요.")
 	@Size(min = 1, max = 25, message = "닉네임을 1 ~ 8자 사이로 입력해주세요.")
 	private String nickname;
