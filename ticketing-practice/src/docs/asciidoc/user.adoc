@@ -16,20 +16,17 @@ operation::user-controller-test/update-user[snippets="http-request,http-response
 == Delete User API
 operation::user-controller-test/delete-user[snippets="http-request,http-response"]
 
-== Read Articles By User API
-operation::user-controller-test/read-articles-by-user[snippets="http-request,http-response"]
+== Read Articles By UserId API
+operation::user-controller-test/read-articles-by-user-id[snippets="http-request,http-response"]
 
-== Read ArticleComments By User API
-operation::user-controller-test/read-article-comments-by-user[snippets="http-request,http-response"]
+== Read ArticleComments By UserId API
+operation::user-controller-test/read-article-comments-by-user-id[snippets="http-request,http-response"]
 
-== Read ConcertComments By User API
-operation::user-controller-test/read-concert-comments-by-user[snippets="http-request,http-response"]
+== Read ConcertComments By UserId API
+operation::user-controller-test/read-concert-comments-by-user-id[snippets="http-request,http-response"]
 
-== Read ConcertWishlists By User API
-operation::user-controller-test/read-concert-wishlists-by-user[snippets="http-request,http-response"]
+== Read ConcertWishlists By UserId API
+operation::user-controller-test/read-concert-wishlists-by-user-id[snippets="http-request,http-response"]
 
-== Read Reservations By User API
-operation::user-controller-test/read-reservations-by-user[snippets="http-request,http-response"]
-
-== Delete Reservation By User API
-operation::user-controller-test/delete-reservation-by-user[snippets="http-request,http-response"]
+== Read Reservations By UserId API
+operation::user-controller-test/read-reservations-by-user-id[snippets="http-request,http-response"]
