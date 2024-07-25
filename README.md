@@ -1,10 +1,29 @@
 # ticketing-practice
-
 공연 예매 연습 웹 애플리케이션
 
-![티켓팅 연습 웹 ERD](https://github.com/user-attachments/assets/7817fa2b-f31d-4095-9bd0-83e852542dce)
-API 명세서: https://chisel-sleet-47c.notion.site/3e9211b2596e4e02bd79cc41c83443aa?v=e87b5508f3954f2095fc7791fcd837fa&pvs=4
+## 기간 / 인원
+- 2024.06 ~ 2024.09 / 1인
 
+## 사용 기술
+- Java 17, Spring Boot, JPA, MySQL
+
+## 핵심 기능
+- 공연 좌석 예매, 예매 취소, 예매 목록 보기
+
+## 경험 및 성과
+- Spring Boot와 JPA를 사용하여 RESTful API를 설계하고 Spring REST Docs로 문서화하며 테스트 주도 개발(TDD)을 실천
+- MockMvc, Mockito, JUnit을 사용하여 Spring MVC 컨트롤러와 서비스 계층의 단위 및 통합 테스트를 자동화하여 API 동작을 검증하고 문서화
+- JaCoCo를 사용하여 테스트 커버리지 80% 이상을 달성하여 코드 품질과 안정성을 보장
+- Spring Validation을 활용해 데이터 유효성 검사 및 예외 처리를 구현하여 API 안정성을 강화
+- 데이터베이스 작업에서 예외 처리와 트랜잭션 관리를 통해 데이터 무결성을 유지하고, Spring Security로 보안을 강화
+- ExceptionHandler로 글로벌 예외 처리를 구현하여 각종 예외 상황에 대해 일관된 응답과 API 가용성을 개선
+
+## ERD 
+![티켓팅 연습 웹 ERD](https://github.com/user-attachments/assets/7817fa2b-f31d-4095-9bd0-83e852542dce)
+
+## API 명세서: https://chisel-sleet-47c.notion.site/3e9211b2596e4e02bd79cc41c83443aa?v=e87b5508f3954f2095fc7791fcd837fa&pvs=4
+
+## Pull Requests
 
 #1 Maven으로 프로젝트 세팅, 회원가입, 로그인 구현
 - ERD 수정 후 엔티티 생성
