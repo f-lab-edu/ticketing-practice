@@ -6,6 +6,7 @@ plugins {
 	// 이 플러그인은 adoc 파일을 변환하고 build 디렉토리에 복사하기 위해 사용하는 플러그인이다.
 	// gradle 7 부터는 이전에 사용하던 org.asciidoctor.convert 대신 asciidoctor.jvm.convert를 사용해야 한다.
 	id "org.asciidoctor.jvm.convert" version "3.3.2"
+	id 'jacoco'	// Jacoco: 테스트 코드 커버리지를 분석해주는 자바의 무료 라이브러리
 }
 
 group = 'com.ticketingberry'
@@ -89,3 +90,93 @@ task copyDocument(type: Copy) {
 build {
     dependsOn copyDocument
 }
+
+jacoco {
+	toolVersion = "0.8.10" // https://www.jacoco.org/jacoco/trunk/doc/changes.html
+}
+
+// 커버리지 결과를 리포트로 저장하는 역할
+jacocoTestReport {
+	dependsOn test
+	reports {
+		html.required = true
+		xml.required = true
+	}
+	
+	// QueryDSL QDomain 제외시키기
+	def QDomains = []
+	
+	for (qPattern in '**/QA'..'**/QZ') {
+        QDomains.add(qPattern + '*')
+    }
+    
+    afterEvaluate {
+    	classDirectories.setFrom(
+    		// 그 외의 매칭되는 클래스도 제외 대상
+            files(classDirectories.files.collect {
+                fileTree(dir: it, excludes: [
+                        "**/*TicketingPracticeApplication*",
+                        "**/*Config*",
+                        "**/*Dto*",
+                        "**/exception/**"
+                ] + QDomains)
+            })
+        )
+    }
+    
+    // test 실행 이후 리포트 생성 후 커버리지 체크
+    // finalizedBy는 A task의 성공과 실패에 상관없이 A가 끝나야 B가 실행
+    // 성공해야 실행되도록 하려면 dependsOn 사용
+    finalizedBy jacocoTestCoverageVerification
+}
+
+jacocoTestCoverageVerification {
+	// QueryDSL QDomain 제외시키기
+	def QDomains = []
+	// qPattern = "*.QA","*.QB","*.QC", ... "*.QZ"
+    for (qPattern in '*.QA'..'*.QZ') {
+        QDomains.add(qPattern + '*')
+    }
+	
+	violationRules {
+		rule {
+			// rule 활성화
+			enabled = true
+			
+			// element: 커버리지를 체크할 기준
+			// 클래스 단위로 커버리지 체크
+			element = 'CLASS'
+			
+			// 라인 커버리지를 최소 80% 만족
+			limit {
+				// counter: 커버리지 측정을 위한 최소 단위
+				// LINE: 빈 줄을 제외한 실제 코드의 라인 수. 라인이 한번이라도 실행되었다면 실행된 것으로 간주
+				counter = 'LINE'	
+				// value: 측정한 커버리지를 어떠한 방식으로 보여줄 것인가
+				// COVEREDRATIO: 커버된 비율. 0 ~ 1 사이의 수로 1이 100% (기본값)
+				value = 'COVEREDRATIO'
+				// minumum: counter 값을 value에 맞게 표현하였을 때의 최솟값
+				// 이를 통해 커버리지 판단의 성공 여부가 결정
+				minimum = 0.80
+			}
+			
+			// excludes: 커버리지 측정 시 제외할 클래스 지정
+			// 패키지 레벨의 경로로 지정. 경로에는 *와 ? 사용
+			excludes = [
+                "**/*TicketingPracticeApplication*",
+                "**/*Config*",
+                "**/*Dto*",
+                "**/exception/**"
+			] + QDomains
+		}
+	}
+}
+
+tasks.named('test') {
+	outputs.dir snippetsDir
+	useJUnitPlatform()
+	// test 수행 이후 리포트 생성
+	finalizedBy jacocoTestReport
+}
+
+// Test 실행의 경우 ./gradlew test, ./gradlew clean build로 실행 가능
