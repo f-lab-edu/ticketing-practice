@@ -63,7 +63,7 @@ public class UserController {
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	public User getUser(@PathVariable("userId") Long userId) {
-		return userService.readUser(userId);
+		return userService.readUserById(userId);
 	}
 	
 	// 회원 정보 수정
