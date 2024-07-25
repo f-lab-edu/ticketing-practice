@@ -2,6 +2,7 @@ package com.ticketingberry.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.ticketingberry.domain.entity.*;
 import com.ticketingberry.domain.repository.*;
+import com.ticketingberry.dto.UpdateUserDto;
 import com.ticketingberry.dto.UserDto;
 import com.ticketingberry.exception.DataNotFoundException;
 import com.ticketingberry.exception.DuplicatedException;
@@ -122,35 +124,91 @@ public class UserServiceTest {
 	}
 	
 	@Test
+	@DisplayName("전체 회원 목록 조회 성공")
+	void readAllUsers_success() {
+		List<User> users = List.of(user, new User());
+		
+		when (userRepository.findAll()).thenReturn(users);
+		
+		List<User> result = userService.readAllUsers();
+		
+		assertEquals(users, result);
+		verify(userRepository, times(1)).findAll();
+	}
+	
+	@Test
 	@DisplayName("userId로 회원 조회 성공")
-	void readUser_success() {
+	void readUserById_success() {
 		when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 		
-		User foundUser = userService.readUser(1L);
+		User foundUser = userService.readUserById(1L);
 		
 		assertEquals(user, foundUser);
 	}
 	
 	@Test
 	@DisplayName("userId로 회원 조회: userId로 회원 조회가 안 된 경우 DataNotFoundException 던지기")
-	void readUser_whenUserIdDoesNotExist_throwsDataNotFoundException() {
+	void readUserById_whenUserIdDoesNotExist_throwsDataNotFoundException() {
 		when(userRepository.findById(1L)).thenReturn(Optional.empty());
 		
 		DataNotFoundException exception = assertThrows(DataNotFoundException.class,
-										  () -> userService.readUser(1L));
+										  () -> userService.readUserById(1L));
 	
 		assertEquals("회원을 찾을 수 없습니다.", exception.getMessage());
 	}
 	
 	@Test
-	@DisplayName("userId로 회원 조회: username으로 회원 조회가 안 된 경우 DataNotFoundException 던지기")
-	void readUser_whenUsernameDoesNotExist_throwsDataNotFoundException() {
+	@DisplayName("username으로 회원 조회 성공")
+	void readUserByUsername_success() {
+		when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+		
+		User foundUser = userService.readUserByUsername("testuser");
+		
+		assertEquals(user, foundUser);
+	}
+	
+	@Test
+	@DisplayName("username으로 회원 조회: username으로 회원 조회가 안 된 경우 DataNotFoundException 던지기")
+	void readUserByUsername_whenUsernameDoesNotExist_throwsDataNotFoundException() {
 		when(userRepository.findByUsername("testuser")).thenReturn(Optional.empty());
 		
 		DataNotFoundException exception = assertThrows(DataNotFoundException.class,
-										  () -> userService.readUser("testuser"));
+										  () -> userService.readUserByUsername("testuser"));
 	
 		assertEquals("username: testuser 회원을 찾을 수 없습니다.", exception.getMessage());
+	}
+	
+	@Test
+	@DisplayName("회원 수정 성공")
+	void updateUser_success() {
+		when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+		
+		UpdateUserDto updateUserDto = new UpdateUserDto();
+		updateUserDto.setNickname("changeUsername");
+		updateUserDto.setEmail("changeEmail@example.com");
+		updateUserDto.setPhone("01012345678");
+		
+		userService.updateUser(1L, updateUserDto);
+		
+		user.update(updateUserDto.getNickname(), updateUserDto.getEmail(), updateUserDto.getPhone());
+		
+		verify(userRepository, times(1)).findById(1L);
+		verify(userRepository, times(1)).save(user);
+		
+		assertThat(user.getNickname()).isEqualTo("changeUsername");
+		assertThat(user.getEmail()).isEqualTo("changeEmail@example.com");
+		assertThat(user.getPhone()).isEqualTo("01012345678");
+	}
+	
+	@Test
+	@DisplayName("회원 삭제 성공")
+	void deleteUser_success() {
+		when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+		
+		userService.deleteUser(1L);
+		
+		verify(userRepository, times(1)).findById(1L);
+		verify(userRepository, times(1)).delete(user);
 	}
 	
 	@Test
