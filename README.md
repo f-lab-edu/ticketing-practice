@@ -49,3 +49,4 @@ https://chisel-sleet-47c.notion.site/3e9211b2596e4e02bd79cc41c83443aa?v=e87b5508
 ### #5 자코코(JaCoCo)를 활용한 테스트 커버리지 측정
 - User의 기능 모두 테스트 커버리지 측정
 - 테스트 커버리지 100% 달성
+![테스트 커버리지 100%](https://github.com/user-attachments/assets/3a767376-2130-4e34-96e4-2386e1acad33)
