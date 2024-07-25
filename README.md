@@ -26,13 +26,13 @@ https://chisel-sleet-47c.notion.site/3e9211b2596e4e02bd79cc41c83443aa?v=e87b5508
 
 ## Pull Requests
 
-#1 Maven으로 프로젝트 세팅, 회원가입, 로그인 구현
+### #1 Maven으로 프로젝트 세팅, 회원가입, 로그인 구현
 - ERD 수정 후 엔티티 생성
 - 회원가입 처리
 - 암호화 처리
 - 로그인, 로그아웃 처리
 
-#3 Gradle로 수정, Spring REST Docs 세팅, User의 API와 기능 구현, User의 테스트 코드 작성
+### #3 Gradle로 수정, Spring REST Docs 세팅, User의 API와 기능 구현, User의 테스트 코드 작성
 - 회원가입 => POST /api/users
 - 모든 회원 검색 => GET /api/users
 - 회원 1명 검색 => GET /api/users/{user_id}
@@ -46,7 +46,7 @@ https://chisel-sleet-47c.notion.site/3e9211b2596e4e02bd79cc41c83443aa?v=e87b5508
 - 회원 1명이 예매한 공연 목록 => GET /api/users/{user_id}/reservations
 - 회원 1명이 예매한 공연 1개 취소 => DELETE /api/users/{user_id}/reservations/{reservation_id}
 
-#5 자코코(JaCoCo)를 활용한 테스트 커버리지 측정, User 외 엔티티 기능 구현 및 테스트 코드 작성
+### #5 자코코(JaCoCo)를 활용한 테스트 커버리지 측정, User 외 엔티티 기능 구현 및 테스트 코드 작성
 - 자코코(JaCoCo)를 활용한 테스트 커버리지 측정
 - 테스트 커버리지 70-80% 이상 목표
 - Board, Article, ArticleComment, Artist, ArtistWishlist, Concert, ConcertComment, ConcertWishlist, Place, District, Seat, Reservation, Image 기능 구현 및 테스트 코드 작성
