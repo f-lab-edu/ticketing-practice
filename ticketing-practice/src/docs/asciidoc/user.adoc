@@ -2,31 +2,34 @@
 // operation을 사용해 snippet의 디렉토리를 지정하고 뒤에 원하는 snippet 종류를 넣어주면 된다.
 
 == Create User API
-operation::user-controller-test/create-user[snippets="http-request,http-response"]
+operation::user-controller-test/add-user[snippets="http-request,http-response"]
 
 == Read All Users API
-operation::user-controller-test/read-all-users[snippets="http-request,http-response"]
+operation::user-controller-test/get-all-users[snippets="http-request,http-response"]
 
 == Read User API
-operation::user-controller-test/read-user[snippets="http-request,http-response"]
+operation::user-controller-test/get-user[snippets="http-request,http-response"]
 
 == Update User API
-operation::user-controller-test/update-user[snippets="http-request,http-response"]
+operation::user-controller-test/modify-user[snippets="http-request,http-response"]
 
 == Delete User API
-operation::user-controller-test/delete-user[snippets="http-request,http-response"]
+operation::user-controller-test/remove-user[snippets="http-request,http-response"]
 
 == Read Articles By UserId API
-operation::user-controller-test/read-articles-by-user-id[snippets="http-request,http-response"]
+operation::user-controller-test/get-articles-by-user-id[snippets="http-request,http-response"]
 
 == Read ArticleComments By UserId API
-operation::user-controller-test/read-article-comments-by-user-id[snippets="http-request,http-response"]
+operation::user-controller-test/get-article-comments-by-user-id[snippets="http-request,http-response"]
 
 == Read ConcertComments By UserId API
-operation::user-controller-test/read-concert-comments-by-user-id[snippets="http-request,http-response"]
+operation::user-controller-test/get-concert-comments-by-user-id[snippets="http-request,http-response"]
 
 == Read ConcertWishlists By UserId API
-operation::user-controller-test/read-concert-wishlists-by-user-id[snippets="http-request,http-response"]
+operation::user-controller-test/get-concert-wishlists-by-user-id[snippets="http-request,http-response"]
+
+== Read ArtistWishlists By UserId API
+operation::user-controller-test/get-concert-wishlists-by-user-id[snippets="http-request,http-response"]
 
 == Read Reservations By UserId API
-operation::user-controller-test/read-reservations-by-user-id[snippets="http-request,http-response"]
+operation::user-controller-test/get-reservations-by-user-id[snippets="http-request,http-response"]
