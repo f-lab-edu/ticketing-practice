@@ -1,0 +1,91 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.3.1'
+	id 'io.spring.dependency-management' version '1.1.5'
+	// (1) asciidoctor에 대한 플러그인을 추가해준다.
+	// 이 플러그인은 adoc 파일을 변환하고 build 디렉토리에 복사하기 위해 사용하는 플러그인이다.
+	// gradle 7 부터는 이전에 사용하던 org.asciidoctor.convert 대신 asciidoctor.jvm.convert를 사용해야 한다.
+	id "org.asciidoctor.jvm.convert" version "3.3.2"
+}
+
+group = 'com.ticketingberry'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+configurations {
+	asciidoctorExt	// (2) asciidoctorExt을 Configuration에 지정해준다.
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'com.googlecode.libphonenumber:libphonenumber:8.13.27'
+    implementation 'org.springframework:spring-context-support'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+	runtimeOnly 'com.mysql:mysql-connector-j'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+	// (3) dependencies에 spring-restdocs-asciidoctor를 추가해준다.
+	// adoc 파일에서 사용할 snippets 속성이 자동으로 build/generated-snippets를 가리키도록 해준다.
+	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'	
+	// (4) MockMvc를 사용하여 테스트할 예정이기 때문에 spring-resetdocs-mockmvc도 dependencies에 추가해준다.
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+	testImplementation 'org.mockito:mockito-core:4.0.0'
+}
+
+ext {
+	snippetsDir = file('build/generated-snippets')	// (5) snippets 파일이 저장될 경로를 설정해준다.
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+	outputs.dir snippetsDir		// (6) 출력할 디렉토리는 설정해준다.
+}
+
+asciidoctor { 
+	// (7) asciidoctor에서 asciidoctorExt을 configurations로 사용하도록 설정한다. 
+    configurations 'asciidoctorExt'	
+    // (8) .adoc 파일에서는 다른 .adoc 파일을 include하여 사용할 수 있는데 그럴 경우 경로를 동일하게 baseDir로 설정해준다.
+    // Gradle 6 버전에서는 자동으로 해주지만 7부터는 직접 명시해줘야 한다.
+    baseDirFollowsSourceFile()
+    // (9) input 디렉토리를 설정해준다.
+    inputs.dir snippetsDir
+    // (10) build시 test 후 asciidoctor를 진행하도록 설정해준다. (순서 설정)			
+    dependsOn test
+}
+
+asciidoctor.doFirst {
+	// (11) 중복을 막기 위해 새로운 문서를 생성할 때에는 전에 생성했던 문서들을 먼저 지워준다.
+    delete file('src/main/resources/static/docs')	
+}
+
+// (12) build/docs/asciidoc 디렉토리에 생성된 html 문서를 src/main/resources/static/docs 디렉토리에 복사해온다.
+task copyDocument(type: Copy) { 	
+    dependsOn asciidoctor
+    from file("build/docs/asciidoc")
+    into file("src/main/resources/static/docs")
+}
+
+// (13) copyDocument 후 build 지정
+build {
+    dependsOn copyDocument
+}

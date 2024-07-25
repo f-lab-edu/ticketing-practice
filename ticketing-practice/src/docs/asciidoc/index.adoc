@@ -1,0 +1,11 @@
+// 전체 코드를 연결해 줄 홈 화면
+// include를 통해 다른 파일을 연결해주면 된다.
+
+= Spring REST Docs Test
+:doctype: book
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:seclinks:
+
+include::user.adoc[]
