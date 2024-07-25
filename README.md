@@ -21,3 +21,4 @@
 - 회원 1명의 아티스트 찜 목록 => GET /api/users/{user_id}/artist-wishlists
 - 회원 1명이 예매한 공연 목록 => GET /api/users/{user_id}/reservations
 - 회원 1명이 예매한 공연 1개 취소 => DELETE /api/users/{user_id}/reservations/{reservation_id}
+
