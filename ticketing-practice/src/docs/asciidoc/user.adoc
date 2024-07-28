@@ -33,3 +33,21 @@ operation::user-controller-test/get-concert-wishlists-by-user-id[snippets="http-
 
 == Read Reservations By UserId API
 operation::user-controller-test/get-reservations-by-user-id[snippets="http-request,http-response"]
+
+== Create User When Passwords Don't Throws BAD_REQUEST
+operation::user-controller-test/add-user-when-passwords-do-not-match-throws-bad-request[snippets="http-request,http-response"]
+
+== Create User - When Passwords Don't Match Throws BAD_REQUEST
+operation::user-controller-test/add-user-when-passwords-do-not-match-throws-bad-request[snippets="http-request,http-response"]
+
+== Create User - When Username Already Exists Throws CONFLICT
+operation::user-controller-test/add-user-when-username-already-exists-throws-conflict[snippets="http-request,http-response"]
+
+== Read User - When UserId Doesn't Exist Throws NOT_FOUND
+operation::user-controller-test/add-user-when-passwords-do-not-match-throws-bad-request[snippets="http-request,http-response"]
+
+
+
+
+
+
