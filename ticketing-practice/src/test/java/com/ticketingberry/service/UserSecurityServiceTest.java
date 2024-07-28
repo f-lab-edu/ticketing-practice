@@ -7,7 +7,6 @@ import static com.ticketingberry.domain.UserRole.*;
 
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,19 +27,14 @@ public class UserSecurityServiceTest {
 	@InjectMocks
 	private UserSecurityService userSecurityService;
 	
-	private User user;
-	
-	@BeforeEach
-	void setUp() {
-		user = new User();
-		user.setUsername("testuser");
-		user.setPassword("testpassword");
-	}
-	
 	@Test
 	@DisplayName("회원 가입된 username으로 ADMIN 권한 얻어오기")
 	void loadUserByUsername_getRoleADMIN_success() {
-		user.setRole(ADMIN);
+		User user = User.builder()
+				.username("testuser")
+				.password("testpassword")
+				.role(ADMIN)
+				.build();
 		
 		when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
 		
@@ -58,7 +52,11 @@ public class UserSecurityServiceTest {
 	@Test
 	@DisplayName("회원 가입된 username으로 USER 권한 얻어오기")
 	void loadUserByUsername_getRoleUSER_success() {
-		user.setRole(USER);
+		User user = User.builder()
+				.username("testuser")
+				.password("testpassword")
+				.role(USER)
+				.build();
 		
 		when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
 		
