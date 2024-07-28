@@ -9,13 +9,17 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 import static com.ticketingberry.domain.UserRole.*;
 
 @Getter
-@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserDto {	// 회원 생성 DTO
 	@NotNull(message = "사용자 아이디를 입력해주세요.")
 	@Size(min = 7, max = 20, message = "사용자 아이디를 7 ~ 20자 사이로 입력해주세요.")
@@ -48,6 +52,7 @@ public class UserDto {	// 회원 생성 DTO
 	@NotNull(message = "성별을 입력해주세요.")
 	private String gender;
 	
+	@Builder.Default
 	private UserRole role = USER;	// 회원가입하는 모든 사람들은 회원 권한을 가짐
 	
 	// 엔티티 생성 정적 메서드
