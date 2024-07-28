@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -14,15 +15,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.ticketingberry.domain.entity.*;
 import com.ticketingberry.domain.repository.*;
 import com.ticketingberry.dto.UpdateUserDto;
 import com.ticketingberry.dto.UserDto;
-import com.ticketingberry.exception.DataNotFoundException;
-import com.ticketingberry.exception.DuplicatedException;
-import com.ticketingberry.exception.PasswordsDoNotMatchException;
 
 @ExtendWith(MockitoExtension.class)	// Mockito를 사용하여 단위 테스트를 수행
 public class UserServiceTest {
@@ -61,21 +60,25 @@ public class UserServiceTest {
 	
 	private User user;
 	
+	private UserDto userDto;
+	
 	@BeforeEach
 	void setUp() {
-		user = new User();
-		user.setId(1L);
+		user = User.builder()
+				.id(1L)
+				.username("testuser")
+				.build();
+		
+		userDto = UserDto.builder()
+				.username("testuser")
+				.password1("testpassword")
+				.password2("testpassword")
+				.build();;
 	}
 	
 	@Test
 	@DisplayName("회원 생성 성공")
 	void createUser_success() {
-		// 회원 가입 사용자 정보 설정
-		UserDto userDto = new UserDto();
-		userDto.setUsername("newUser");
-		userDto.setPassword1("password");
-		userDto.setPassword2("password");
-		
 		// 목 객체의 동작 정의
 		when(userRepository.findByUsername(userDto.getUsername())).thenReturn(Optional.empty());
 		when(passwordEncoder.encode(userDto.getPassword1())).thenReturn("encodedPassword");
@@ -94,39 +97,35 @@ public class UserServiceTest {
 	}
 	
 	@Test
-	@DisplayName("회원 생성: 비밀번호와 비밀번호 확인이 다르면 PasswordsDoNotMatchException 던지기")
-	void createUser_whenPasswordsDoNotMatch_throwsPasswordsDoNotMatchException() {
-		UserDto userDto = new UserDto();
-		userDto.setPassword1("password");
-		userDto.setPassword2("differentPassword");
+	@DisplayName("회원 생성: 비밀번호와 비밀번호 확인이 다르면 IllegalArgumentException 던지기")
+	void createUser_whenPasswordsDoNotMatch_throwsIllegalArgumentExceptionn() {
+		userDto = UserDto.builder()
+				.password1("password")
+				.password2("differentPassword")
+				.build();
 		
-		PasswordsDoNotMatchException exception = assertThrows(PasswordsDoNotMatchException.class, 
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, 
 											() -> userService.createUser(userDto));
 	
 		assertEquals("비밀번호와 비밀번호 확인이 다릅니다.", exception.getMessage());
 	}
 	
 	@Test
-	@DisplayName("회원 생성: username으로 회원 조회가 된 경우 중복 객체이므로 DuplicatedException 던지기")
-	void createUser_whenUsernameExists_throwsDuplicatedException() {
-		UserDto userDto = new UserDto();
-		userDto.setUsername("existingUser");
-		userDto.setPassword1("password");
-		userDto.setPassword2("password");
-		
+	@DisplayName("회원 생성: username으로 회원 조회가 된 경우 중복 객체이므로 DataIntegrityViolationException 던지기")
+	void createUser_whenUsernameExists_throwsDataIntegrityViolationException() {
 		when (userRepository.findByUsername(userDto.getUsername()))
-		.thenReturn(Optional.of(new User()));
+		.thenReturn(Optional.of(User.builder().build()));
 		
-		DuplicatedException exception = assertThrows(DuplicatedException.class,
+		DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class,
 										() -> userService.createUser(userDto));
 		
-		assertEquals("username: existingUser은 이미 존재하는 회원입니다.", exception.getMessage());;
+		assertEquals("username: testuser은 이미 존재하는 회원입니다.", exception.getMessage());;
 	}
 	
 	@Test
 	@DisplayName("전체 회원 목록 조회 성공")
 	void readAllUsers_success() {
-		List<User> users = List.of(user, new User());
+		List<User> users = List.of(user, User.builder().build());
 		
 		when (userRepository.findAll()).thenReturn(users);
 		
@@ -141,18 +140,18 @@ public class UserServiceTest {
 	void readUserById_success() {
 		when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 		
-		User foundUser = userService.readUserById(1L);
+		User foundUser = userService.findById(1L);
 		
 		assertEquals(user, foundUser);
 	}
 	
 	@Test
-	@DisplayName("userId로 회원 조회: userId로 회원 조회가 안 된 경우 DataNotFoundException 던지기")
-	void readUserById_whenUserIdDoesNotExist_throwsDataNotFoundException() {
+	@DisplayName("userId로 회원 조회: userId로 회원 조회가 안 된 경우 NoSuchElementException 던지기")
+	void readUserById_whenUserIdDoesNotExist_throwsNoSuchElementException() {
 		when(userRepository.findById(1L)).thenReturn(Optional.empty());
 		
-		DataNotFoundException exception = assertThrows(DataNotFoundException.class,
-										  () -> userService.readUserById(1L));
+		NoSuchElementException exception = assertThrows(NoSuchElementException.class,
+										  () -> userService.findById(1L));
 	
 		assertEquals("회원을 찾을 수 없습니다.", exception.getMessage());
 	}
@@ -162,18 +161,18 @@ public class UserServiceTest {
 	void readUserByUsername_success() {
 		when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
 		
-		User foundUser = userService.readUserByUsername("testuser");
+		User foundUser = userService.findByUsername("testuser");
 		
 		assertEquals(user, foundUser);
 	}
 	
 	@Test
-	@DisplayName("username으로 회원 조회: username으로 회원 조회가 안 된 경우 DataNotFoundException 던지기")
-	void readUserByUsername_whenUsernameDoesNotExist_throwsDataNotFoundException() {
+	@DisplayName("username으로 회원 조회: username으로 회원 조회가 안 된 경우 NoSuchElementException 던지기")
+	void readUserByUsername_whenUsernameDoesNotExist_throwsNoSuchElementException() {
 		when(userRepository.findByUsername("testuser")).thenReturn(Optional.empty());
 		
-		DataNotFoundException exception = assertThrows(DataNotFoundException.class,
-										  () -> userService.readUserByUsername("testuser"));
+		NoSuchElementException exception = assertThrows(NoSuchElementException.class,
+										  () -> userService.findByUsername("testuser"));
 	
 		assertEquals("username: testuser 회원을 찾을 수 없습니다.", exception.getMessage());
 	}
@@ -183,10 +182,11 @@ public class UserServiceTest {
 	void updateUser_success() {
 		when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 		
-		UpdateUserDto updateUserDto = new UpdateUserDto();
-		updateUserDto.setNickname("changeUsername");
-		updateUserDto.setEmail("changeEmail@example.com");
-		updateUserDto.setPhone("01012345678");
+		UpdateUserDto updateUserDto = UpdateUserDto.builder()
+				.nickname("changeUsername")
+				.email("changeEmail@example.com")
+				.phone("01012345678")
+				.build();;
 		
 		userService.updateUser(1L, updateUserDto);
 		
@@ -224,7 +224,7 @@ public class UserServiceTest {
 		when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 		when(articleRepository.findByUser(user)).thenReturn(articles);
 		
-		List<Article> result = userService.readArticlesByUserId(1L);
+		List<Article> result = userService.findArticlesByUserId(1L);
 		
 		assertEquals(articles, result);
 		verify(userRepository, times(1)).findById(1L);
@@ -244,7 +244,7 @@ public class UserServiceTest {
 		when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 		when(articleCommentRepository.findByUser(user)).thenReturn(articleComments);
 		
-		List<ArticleComment> result = userService.readArticleCommentsByUserId(1L);
+		List<ArticleComment> result = userService.findArticleCommentsByUserId(1L);
 		
 		assertEquals(articleComments, result);
 		verify(userRepository, times(1)).findById(1L);
@@ -264,7 +264,7 @@ public class UserServiceTest {
 		when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 		when(concertCommentRepository.findByUser(user)).thenReturn(concertComments);
 		
-		List<ConcertComment> result = userService.readConcertCommentsByUserId(1L);
+		List<ConcertComment> result = userService.findConcertCommentsByUserId(1L);
 		
 		assertEquals(concertComments, result);
 		verify(userRepository, times(1)).findById(1L);
@@ -284,7 +284,7 @@ public class UserServiceTest {
 		when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 		when(concertWishlistRepository.findByUser(user)).thenReturn(concertWishlists);
 		
-		List<ConcertWishlist> result = userService.readConcertWishlistsByUserId(1L);
+		List<ConcertWishlist> result = userService.findConcertWishlistsByUserId(1L);
 		
 		assertEquals(concertWishlists, result);
 		verify(userRepository, times(1)).findById(1L);
@@ -304,7 +304,7 @@ public class UserServiceTest {
 		when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 		when(artistWishlistRepository.findByUser(user)).thenReturn(artistWishlists);
 		
-		List<ArtistWishlist> result = userService.readArtistWishlistsByUserId(1L);
+		List<ArtistWishlist> result = userService.findArtistWishlistsByUserId(1L);
 		
 		assertEquals(artistWishlists, result);
 		verify(userRepository, times(1)).findById(1L);
@@ -324,7 +324,7 @@ public class UserServiceTest {
 		when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 		when(reservationRepository.findByUser(user)).thenReturn(reservations);
 		
-		List<Reservation> result = userService.readReservationsByUserId(1L);
+		List<Reservation> result = userService.findReservationsByUserId(1L);
 		
 		assertEquals(reservations, result);
 		verify(userRepository, times(1)).findById(1L);
