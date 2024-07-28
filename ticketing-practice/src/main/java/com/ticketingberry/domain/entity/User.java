@@ -22,10 +22,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @Entity
 @Builder				// 빌더 패턴 사용을 위한 어노테이션
 @NoArgsConstructor		// 기본 생성자를 만들어주는 어노테이션
