@@ -13,7 +13,6 @@ import static com.ticketingberry.domain.UserRole.*;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +21,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.context.WebApplicationContext;
@@ -33,6 +31,9 @@ import com.ticketingberry.controller.common.AbstractRestDocsTests;
 import com.ticketingberry.domain.entity.*;
 import com.ticketingberry.dto.UserDto;
 import com.ticketingberry.exception.ExceptionAdvice;
+import com.ticketingberry.exception.custom.DataDuplicatedException;
+import com.ticketingberry.exception.custom.DataNotFoundException;
+import com.ticketingberry.exception.custom.PasswordsUnequalException;
 import com.ticketingberry.dto.UpdateUserDto;
 import com.ticketingberry.service.UserService;
 
@@ -105,7 +106,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				.gender("F")
 				.build();
 		
-		Mockito.doThrow(new IllegalArgumentException("비밀번호와 비밀번호 확인이 다릅니다."))
+		Mockito.doThrow(new PasswordsUnequalException("비밀번호와 비밀번호 확인이 다릅니다."))
 		.when(userService).createUser(any(UserDto.class));
 		
 		// API 호출 및 테스트
@@ -120,7 +121,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	@Test
 	@DisplayName("회원 가입: username으로 회원 조회가 된 경우 중복 객체이므로 409(CONFLICT) 응답")
 	void addUser_whenUsernameAlreadyExists_throwsConflict() throws Exception {		
-		Mockito.doThrow(new DataIntegrityViolationException("username: " + userDto.getUsername() + "은 이미 존재하는 회원입니다."))
+		Mockito.doThrow(new DataDuplicatedException("username: " + userDto.getUsername() + "은 이미 존재하는 회원입니다."))
 		.when(userService).createUser(any(UserDto.class));
 		
 		// API 호출 및 테스트
@@ -170,7 +171,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 		Long userId = 1L;
 		
 		// UserService의 Mock 객체에 대해 readUser 메서드 호출 시 반환 값 설정
-		when(userService.findById(userId)).thenReturn(user);
+		when(userService.findUserByUserId(userId)).thenReturn(user);
 		
 		MvcResult result = mockMvc.perform(get("/api/users/{userId}", userId))
 				.andExpect(status().isOk())
@@ -194,8 +195,8 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	void getUser_whenUserIdDoesNotExist_throwsNotFound() throws Exception {
 		Long userId = 1L;
 		
-		Mockito.when(userService.findById(userId))
-		.thenThrow(new NoSuchElementException("회원을 찾을 수 없습니다."));
+		Mockito.when(userService.findUserByUserId(userId))
+		.thenThrow(new DataNotFoundException("회원을 찾을 수 없습니다."));
 		
 		mockMvc.perform(get("/api/users/{userId}", userId))
 				.andExpect(status().isNotFound())
@@ -226,7 +227,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	void removeUser() throws Exception {
 		Long userId = 1L;
 		
-		when(userService.findById(userId)).thenReturn(user);
+		when(userService.findUserByUserId(userId)).thenReturn(user);
 		doNothing().when(userService).deleteUser(userId);	// 회원 삭제 시 아무 동작도 하지 않도록 하기
 		
 		mockMvc.perform(delete("/api/users/{userId}", userId))
@@ -248,7 +249,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 					.title("제목2").content("게시글2의 내용입니다.").hits(0)
 					.createdAt(LocalDateTime.now()).build());
 		
-		when(userService.findById(userId)).thenReturn(user);
+		when(userService.findUserByUserId(userId)).thenReturn(user);
 		when(userService.findArticlesByUserId(userId)).thenReturn(articles);
 		
 		MvcResult result = mockMvc.perform(get("/api/users/{userId}/articles", userId)
@@ -285,7 +286,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				ArticleComment.builder().id(2L).article(article).user(user)
 				.content("게시글 댓글2의 내용입니다.").createdAt(LocalDateTime.now()).build());
 		
-		when(userService.findById(userId)).thenReturn(user);
+		when(userService.findUserByUserId(userId)).thenReturn(user);
 		when(userService.findArticleCommentsByUserId(userId)).thenReturn(articleComments);
 		
 		MvcResult result = mockMvc.perform(get("/api/users/{userId}/article-comments", userId)
@@ -329,7 +330,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				ConcertComment.builder().id(2L).concert(concert).user(user)
 				.content("콘서트의 댓글2입니다.").createdAt(LocalDateTime.now()).build());
 		
-		when(userService.findById(userId)).thenReturn(user);
+		when(userService.findUserByUserId(userId)).thenReturn(user);
 		when(userService.findConcertCommentsByUserId(userId)).thenReturn(concertComments);
 		
 		MvcResult result = mockMvc.perform(get("/api/users/{userId}/concert-comments", userId)
@@ -371,7 +372,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				ConcertWishlist.builder().id(1L).concert(concert).user(user)
 				.createdAt(LocalDateTime.now()).build());
 		
-		when(userService.findById(userId)).thenReturn(user);
+		when(userService.findUserByUserId(userId)).thenReturn(user);
 		when(userService.findConcertWishlistsByUserId(userId)).thenReturn(concertWishlists);
 		
 		MvcResult result = mockMvc.perform(get("/api/users/{userId}/concert-wishlists", userId)
@@ -404,7 +405,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				ArtistWishlist.builder().id(1L).artist(artist).user(user)
 				.createdAt(LocalDateTime.now()).build());
 		
-		when(userService.findById(userId)).thenReturn(user);
+		when(userService.findUserByUserId(userId)).thenReturn(user);
 		when(userService.findArtistWishlistsByUserId(userId)).thenReturn(artistWishlists);
 		
 		MvcResult result = mockMvc.perform(get("/api/users/{userId}/artist-wishlists", userId)
@@ -451,7 +452,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				Reservation.builder().id(1L).seat(seat).user(user).deposited(true)
 				.createdAt(LocalDateTime.now()).build());
 	
-		when(userService.findById(userId)).thenReturn(user);
+		when(userService.findUserByUserId(userId)).thenReturn(user);
 		when(userService.findReservationsByUserId(userId)).thenReturn(reservations);
 		
 		MvcResult result = mockMvc.perform(get("/api/users/{userId}/reservations", userId)
