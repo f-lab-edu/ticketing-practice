@@ -5,7 +5,6 @@ import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -15,13 +14,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.ticketingberry.domain.entity.*;
 import com.ticketingberry.domain.repository.*;
 import com.ticketingberry.dto.UpdateUserDto;
 import com.ticketingberry.dto.UserDto;
+import com.ticketingberry.exception.custom.DataDuplicatedException;
+import com.ticketingberry.exception.custom.DataNotFoundException;
+import com.ticketingberry.exception.custom.PasswordsUnequalException;
 
 @ExtendWith(MockitoExtension.class)	// Mockito를 사용하여 단위 테스트를 수행
 public class UserServiceTest {
@@ -97,26 +98,26 @@ public class UserServiceTest {
 	}
 	
 	@Test
-	@DisplayName("회원 생성: 비밀번호와 비밀번호 확인이 다르면 IllegalArgumentException 던지기")
-	void createUser_whenPasswordsDoNotMatch_throwsIllegalArgumentExceptionn() {
+	@DisplayName("회원 생성: 비밀번호와 비밀번호 확인이 다르면 PasswordsUnequalException 던지기")
+	void createUser_whenPasswordsDoNotMatch_throwsPasswordsUnequalException() {
 		userDto = UserDto.builder()
 				.password1("password")
 				.password2("differentPassword")
 				.build();
 		
-		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, 
+		PasswordsUnequalException exception = assertThrows(PasswordsUnequalException.class, 
 											() -> userService.createUser(userDto));
 	
 		assertEquals("비밀번호와 비밀번호 확인이 다릅니다.", exception.getMessage());
 	}
 	
 	@Test
-	@DisplayName("회원 생성: username으로 회원 조회가 된 경우 중복 객체이므로 DataIntegrityViolationException 던지기")
-	void createUser_whenUsernameExists_throwsDataIntegrityViolationException() {
+	@DisplayName("회원 생성: username으로 회원 조회가 된 경우 중복 객체이므로 DataDupliactedException 던지기")
+	void createUser_whenUsernameExists_throwsDataDupliactedException() {
 		when (userRepository.findByUsername(userDto.getUsername()))
 		.thenReturn(Optional.of(User.builder().build()));
 		
-		DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class,
+		DataDuplicatedException exception = assertThrows(DataDuplicatedException.class,
 										() -> userService.createUser(userDto));
 		
 		assertEquals("username: testuser은 이미 존재하는 회원입니다.", exception.getMessage());;
@@ -140,18 +141,18 @@ public class UserServiceTest {
 	void readUserById_success() {
 		when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 		
-		User foundUser = userService.findById(1L);
+		User foundUser = userService.findUserByUserId(1L);
 		
 		assertEquals(user, foundUser);
 	}
 	
 	@Test
-	@DisplayName("userId로 회원 조회: userId로 회원 조회가 안 된 경우 NoSuchElementException 던지기")
-	void readUserById_whenUserIdDoesNotExist_throwsNoSuchElementException() {
+	@DisplayName("userId로 회원 조회: userId로 회원 조회가 안 된 경우 DataNotFoundException 던지기")
+	void readUserById_whenUserIdDoesNotExist_throwsDataNotFoundException() {
 		when(userRepository.findById(1L)).thenReturn(Optional.empty());
 		
-		NoSuchElementException exception = assertThrows(NoSuchElementException.class,
-										  () -> userService.findById(1L));
+		DataNotFoundException exception = assertThrows(DataNotFoundException.class,
+										  () -> userService.findUserByUserId(1L));
 	
 		assertEquals("회원을 찾을 수 없습니다.", exception.getMessage());
 	}
@@ -161,18 +162,18 @@ public class UserServiceTest {
 	void readUserByUsername_success() {
 		when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
 		
-		User foundUser = userService.findByUsername("testuser");
+		User foundUser = userService.findUserByUsername("testuser");
 		
 		assertEquals(user, foundUser);
 	}
 	
 	@Test
-	@DisplayName("username으로 회원 조회: username으로 회원 조회가 안 된 경우 NoSuchElementException 던지기")
-	void readUserByUsername_whenUsernameDoesNotExist_throwsNoSuchElementException() {
+	@DisplayName("username으로 회원 조회: username으로 회원 조회가 안 된 경우 DataNotFoundException 던지기")
+	void readUserByUsername_whenUsernameDoesNotExist_throwsDataNotFoundException() {
 		when(userRepository.findByUsername("testuser")).thenReturn(Optional.empty());
 		
-		NoSuchElementException exception = assertThrows(NoSuchElementException.class,
-										  () -> userService.findByUsername("testuser"));
+		DataNotFoundException exception = assertThrows(DataNotFoundException.class,
+										  () -> userService.findUserByUsername("testuser"));
 	
 		assertEquals("username: testuser 회원을 찾을 수 없습니다.", exception.getMessage());
 	}
