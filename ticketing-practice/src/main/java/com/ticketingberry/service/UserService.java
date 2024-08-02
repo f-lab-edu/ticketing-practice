@@ -1,9 +1,7 @@
 package com.ticketingberry.service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +22,9 @@ import com.ticketingberry.domain.repository.ReservationRepository;
 import com.ticketingberry.domain.repository.UserRepository;
 import com.ticketingberry.domain.repository.common.UserRelatedRepository;
 import com.ticketingberry.dto.UserDto;
+import com.ticketingberry.exception.custom.DataDuplicatedException;
+import com.ticketingberry.exception.custom.DataNotFoundException;
+import com.ticketingberry.exception.custom.PasswordsUnequalException;
 import com.ticketingberry.dto.UpdateUserDto;
 
 import lombok.RequiredArgsConstructor;
@@ -45,12 +46,12 @@ public class UserService {
 	public Long createUser(UserDto userDto) {
 		// 비밀번호와 비밀번호 확인이 다를 경우 400(BAD_REQUEST) 던지기
 		if (!userDto.getPassword1().equals(userDto.getPassword2())) {
-			throw new IllegalArgumentException("비밀번호와 비밀번호 확인이 다릅니다.");
+			throw new PasswordsUnequalException("비밀번호와 비밀번호 확인이 다릅니다.");
 		}
 		
 		// username으로 회원 조회가 된 경우 중복 객체이므로 409(CONFLICT) 던지기
 		userRepository.findByUsername(userDto.getUsername()).ifPresent(duplicatedUser -> {
-			throw new DataIntegrityViolationException("username: " + userDto.getUsername() + "은 이미 존재하는 회원입니다.");
+			throw new DataDuplicatedException("username: " + userDto.getUsername() + "은 이미 존재하는 회원입니다.");
 		});
 		
 		// Dto에서 Entity로 변환
@@ -69,23 +70,23 @@ public class UserService {
 	
 	// userId로 회원 조회
 	@Transactional
-	public User findById(Long userId) {
+	public User findUserByUserId(Long userId) {
 		// userId로 회원 조회가 안 된 경우 404(NOT_FOUND) 던지기
 		return userRepository.findById(userId)
-				.orElseThrow(() -> new NoSuchElementException("회원을 찾을 수 없습니다."));
+				.orElseThrow(() -> new DataNotFoundException("회원을 찾을 수 없습니다."));
 	}
 	
 	// username으로 회원 조회
 	@Transactional
-	public User findByUsername(String username) {
+	public User findUserByUsername(String username) {
 		return userRepository.findByUsername(username)
-				.orElseThrow(() -> new NoSuchElementException("username: " + username + " 회원을 찾을 수 없습니다."));
+				.orElseThrow(() -> new DataNotFoundException("username: " + username + " 회원을 찾을 수 없습니다."));
 	}
 	
 	// 회원 수정
 	@Transactional
 	public void updateUser(Long userId, UpdateUserDto updateUserDto) {
-		User user = findById(userId);
+		User user = findUserByUserId(userId);
 		user.update(updateUserDto.getNickname(), updateUserDto.getEmail(), updateUserDto.getPhone());
 		userRepository.save(user);
 	}
@@ -93,15 +94,8 @@ public class UserService {
 	// 회원 삭제
 	@Transactional
 	public void deleteUser(Long userId) {
-		User user = findById(userId);
+		User user = findUserByUserId(userId);
 		userRepository.delete(user);
-	}
-	
-	// 회원 1명의 엔티티 목록 조회
-	@Transactional
-	public <T> List<T> findEntitiesByUserId(Long userId, UserRelatedRepository<T> repository) {
-		User user = findById(userId);
-		return repository.findByUser(user);
 	}
 	
 	// 회원 1명이 작성한 게시글 목록 조회
@@ -138,5 +132,12 @@ public class UserService {
 	@Transactional
 	public List<Reservation> findReservationsByUserId(Long userId) {
 		return findEntitiesByUserId(userId, reservationRepository);
+	}
+	
+	// 회원 1명의 엔티티 목록 조회
+	@Transactional
+	private <T> List<T> findEntitiesByUserId(Long userId, UserRelatedRepository<T> repository) {
+		User user = findUserByUserId(userId);
+		return repository.findByUser(user);
 	}
 }
