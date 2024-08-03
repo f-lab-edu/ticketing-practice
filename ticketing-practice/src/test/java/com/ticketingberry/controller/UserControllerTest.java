@@ -5,6 +5,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.hamcrest.Matchers.*;
 
 import static com.ticketingberry.domain.UserRole.*;
 
@@ -15,20 +17,23 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ticketingberry.advice.ExceptionAdvice;
 import com.ticketingberry.controller.common.AbstractRestDocsTests;
 import com.ticketingberry.domain.entity.*;
 import com.ticketingberry.dto.UserDto;
+import com.ticketingberry.exception.ExceptionAdvice;
+import com.ticketingberry.exception.custom.DataDuplicatedException;
+import com.ticketingberry.exception.custom.DataNotFoundException;
+import com.ticketingberry.exception.custom.PasswordsUnequalException;
 import com.ticketingberry.dto.UpdateUserDto;
 import com.ticketingberry.service.UserService;
 
@@ -38,8 +43,7 @@ import com.ticketingberry.service.UserService;
 //RestDocumentationResultHandler가 알아서 실제 응답에 따라 API를 생성해준다.
 //하지만 이렇게 하면 description과 type에 대한 내용은 명시할 수 없기 때문에 필요에 따라 잘 사용하면 될 것 같다.
 
-@WebMvcTest(UserController.class)	// UserController만 로드
-@Import(ExceptionAdvice.class)
+@WebMvcTest({UserController.class, ExceptionAdvice.class})
 public class UserControllerTest extends AbstractRestDocsTests {
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -48,6 +52,8 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	private UserService userService;
 	
 	private User user;
+	
+	private UserDto userDto;
 	
 	@BeforeEach
 	void setUp(WebApplicationContext context) {
@@ -63,21 +69,22 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				.role(USER)
 				.createdAt(LocalDateTime.now())
 				.build();
+		
+		userDto = UserDto.builder()
+				.username("testuser")
+				.password1("testpassword")
+				.password2("testpassword")
+				.nickname("테스트")
+				.email("testuser@example.com")
+				.phone("01012345678")
+				.birth("20000101")
+				.gender("F")
+				.build();
 	}
 	
 	@Test
 	@DisplayName("회원 가입")
-	void createUser() throws Exception {
-		UserDto userDto = new UserDto();
-		userDto.setUsername("testuser");
-		userDto.setPassword1("testpassword");
-		userDto.setPassword2("testpassword");
-		userDto.setNickname("테스트");
-		userDto.setEmail("testuser@example.com");
-		userDto.setPhone("01012345678");
-		userDto.setBirth("20000101");
-		userDto.setGender("F");
-		
+	void addUser() throws Exception {		
 		// API 호출 및 테스트
 		mockMvc.perform(post("/api/users")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -85,33 +92,51 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				.andExpect(status().isCreated());
 	}
 	
-//	@Test
-//	@DisplayName("회원 가입: 비밀번호와 비밀번호 확인이 다르면 400(BadRequest) 응답")
-//	void createUser_whenPasswordsDoNotMatch_throwsBadRequest() throws Exception {
-//		UserDto userDto = new UserDto();
-//		userDto.setUsername("testuser");
-//		userDto.setPassword1("password");
-//		userDto.setPassword2("differentPassword");
-//		userDto.setNickname("테스트");
-//		userDto.setEmail("testuser@example.com");
-//		userDto.setPhone("01012345678");
-//		userDto.setBirth("20000101");
-//		userDto.setGender("F");
-//		
-//		// 모킹된 UserService에서 PasswordsDoNotMatchException을 던지도록 설정
-//		when(userService.createUser(userDto)).thenThrow(new PasswordsDoNotMatchException("비밀번호와 비밀번호 확인이 다릅니다."));
-//		
-//		// API 호출 및 테스트
-//		mockMvc.perform(post("/api/users")
-//				.contentType(MediaType.APPLICATION_JSON)
-//				.content(objectMapper.writeValueAsString(userDto)))
-//				.andExpect(status().isBadRequest())
-//				.andExpect(content().json("{\"error\":\"비밀번호와 비밀번호 확인이 다릅니다.\"}"));
-//	}
+	@Test
+	@DisplayName("회원 가입: 비밀번호와 비밀번호 확인이 다르면 400(BAD_REQUEST) 응답")
+	void addUser_whenPasswordsDoNotMatch_throwsBadRequest() throws Exception {
+		userDto = UserDto.builder()
+				.username("testuser")
+				.password1("password")
+				.password2("differentPassword")
+				.nickname("테스트")
+				.email("testuser@example.com")
+				.phone("01012345678")
+				.birth("20000101")
+				.gender("F")
+				.build();
+		
+		Mockito.doThrow(new PasswordsUnequalException("비밀번호와 비밀번호 확인이 다릅니다."))
+		.when(userService).createUser(any(UserDto.class));
+		
+		// API 호출 및 테스트
+		mockMvc.perform(post("/api/users")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(userDto)))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message", is("비밀번호와 비밀번호 확인이 다릅니다.")))
+				.andExpect(jsonPath("$.status", is(400)));
+	}
+	
+	@Test
+	@DisplayName("회원 가입: username으로 회원 조회가 된 경우 중복 객체이므로 409(CONFLICT) 응답")
+	void addUser_whenUsernameAlreadyExists_throwsConflict() throws Exception {		
+		Mockito.doThrow(new DataDuplicatedException("username: " + userDto.getUsername() + "은 이미 존재하는 회원입니다."))
+		.when(userService).createUser(any(UserDto.class));
+		
+		// API 호출 및 테스트
+		mockMvc.perform(post("/api/users")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(userDto)))
+				.andExpect(status().isConflict())
+				.andExpect(jsonPath("$.message", is("username: " + userDto.getUsername() + "은 이미 존재하는 회원입니다.")))
+				.andExpect(jsonPath("$.status", is(409)));
+				
+	}
 	
 	@Test
 	@DisplayName("전체 회원 목록 조회")
-	void readAllUsers() throws Exception {
+	void getAllUsers() throws Exception {
 		List<User> users = List.of(user,
 				User.builder().id(2L).username("testuser2").password("testpassword")
 				.nickname("테스트2").email("testuser2@example.com").phone("01098765432")
@@ -142,11 +167,11 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	
 	@Test
 	@DisplayName("회원 1명 조회")
-	void readUser() throws Exception {
+	void getUser() throws Exception {
 		Long userId = 1L;
 		
 		// UserService의 Mock 객체에 대해 readUser 메서드 호출 시 반환 값 설정
-		when(userService.readUser(userId)).thenReturn(user);
+		when(userService.findUserByUserId(userId)).thenReturn(user);
 		
 		MvcResult result = mockMvc.perform(get("/api/users/{userId}", userId))
 				.andExpect(status().isOk())
@@ -166,28 +191,43 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	}
 	
 	@Test
-	@DisplayName("회원 정보 수정")
-	void updateUser() throws Exception {
+	@DisplayName("회원 1명 조회: userId로 회원 조회가 안 된 경우 404(NOT_FOUND) 던지기")
+	void getUser_whenUserIdDoesNotExist_throwsNotFound() throws Exception {
 		Long userId = 1L;
 		
-		UpdateUserDto userUpdateRequest = new UpdateUserDto();
-		userUpdateRequest.setNickname("updateduser");
-		userUpdateRequest.setEmail("updateduser@example.com");
-		userUpdateRequest.setPhone("01098765432");
+		Mockito.when(userService.findUserByUserId(userId))
+		.thenThrow(new DataNotFoundException("회원을 찾을 수 없습니다."));
+		
+		mockMvc.perform(get("/api/users/{userId}", userId))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.message", is("회원을 찾을 수 없습니다.")))
+				.andExpect(jsonPath("$.status", is(404)));
+	}
+	
+	@Test
+	@DisplayName("회원 정보 수정")
+	void modifyUser() throws Exception {
+		Long userId = 1L;
+		
+		UpdateUserDto updateUserDto = UpdateUserDto.builder()
+				.nickname("changeUsername")
+				.email("changeEmail@example.com")
+				.phone("01012345678")
+				.build();
 	
 		// API 호출 및 테스트
 		mockMvc.perform(put("/api/users/{userId}", userId)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(userUpdateRequest)))
+				.content(objectMapper.writeValueAsString(updateUserDto)))
 				.andExpect(status().isOk());
 	}
 	
 	@Test
 	@DisplayName("회원 탈퇴")
-	void deleteUser() throws Exception {
+	void removeUser() throws Exception {
 		Long userId = 1L;
 		
-		when(userService.readUser(userId)).thenReturn(user);
+		when(userService.findUserByUserId(userId)).thenReturn(user);
 		doNothing().when(userService).deleteUser(userId);	// 회원 삭제 시 아무 동작도 하지 않도록 하기
 		
 		mockMvc.perform(delete("/api/users/{userId}", userId))
@@ -196,7 +236,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	
 	@Test
 	@DisplayName("회원 1명이 작성한 게시글 목록 조회")
-	void readArticlesByUserId() throws Exception {		
+	void getArticlesByUserId() throws Exception {		
 		Long userId = 1L;
 		
 		Board board = Board.builder().id(1L).name("자유게시판").build();
@@ -209,8 +249,8 @@ public class UserControllerTest extends AbstractRestDocsTests {
 					.title("제목2").content("게시글2의 내용입니다.").hits(0)
 					.createdAt(LocalDateTime.now()).build());
 		
-		when(userService.readUser(userId)).thenReturn(user);
-		when(userService.readArticlesByUserId(userId)).thenReturn(articles);
+		when(userService.findUserByUserId(userId)).thenReturn(user);
+		when(userService.findArticlesByUserId(userId)).thenReturn(articles);
 		
 		MvcResult result = mockMvc.perform(get("/api/users/{userId}/articles", userId)
 				.accept(MediaType.APPLICATION_JSON))
@@ -232,7 +272,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	
 	@Test
 	@DisplayName("회원 1명이 작성한 게시글 댓글 목록 조회")
-	void readArticleCommentsByUserId() throws Exception {	
+	void getArticleCommentsByUserId() throws Exception {	
 		Long userId = 1L;
 		
 		Board board = Board.builder().id(1L).name("자유게시판").build();
@@ -246,8 +286,8 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				ArticleComment.builder().id(2L).article(article).user(user)
 				.content("게시글 댓글2의 내용입니다.").createdAt(LocalDateTime.now()).build());
 		
-		when(userService.readUser(userId)).thenReturn(user);
-		when(userService.readArticleCommentsByUserId(userId)).thenReturn(articleComments);
+		when(userService.findUserByUserId(userId)).thenReturn(user);
+		when(userService.findArticleCommentsByUserId(userId)).thenReturn(articleComments);
 		
 		MvcResult result = mockMvc.perform(get("/api/users/{userId}/article-comments", userId)
 				.accept(MediaType.APPLICATION_JSON))
@@ -270,7 +310,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	
 	@Test
 	@DisplayName("회원 1명이 작성한 콘서트 댓글 목록 조회")
-	void readConcertCommentsByUserId() throws Exception {
+	void getConcertCommentsByUserId() throws Exception {
 		Long userId = 1L;
 		
 		Place place = Place.builder().id(1L).name("KSPO DOME")
@@ -290,8 +330,8 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				ConcertComment.builder().id(2L).concert(concert).user(user)
 				.content("콘서트의 댓글2입니다.").createdAt(LocalDateTime.now()).build());
 		
-		when(userService.readUser(userId)).thenReturn(user);
-		when(userService.readConcertCommentsByUserId(userId)).thenReturn(concertComments);
+		when(userService.findUserByUserId(userId)).thenReturn(user);
+		when(userService.findConcertCommentsByUserId(userId)).thenReturn(concertComments);
 		
 		MvcResult result = mockMvc.perform(get("/api/users/{userId}/concert-comments", userId)
 				.accept(MediaType.APPLICATION_JSON))
@@ -314,7 +354,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	
 	@Test
 	@DisplayName("회원 1명의 콘서트 찜 목록 조회")
-	void readConcertWishlistsByUserId() throws Exception {
+	void getConcertWishlistsByUserId() throws Exception {
 		Long userId = 1L;
 		
 		Place place = Place.builder().id(1L).name("KSPO DOME")
@@ -332,8 +372,8 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				ConcertWishlist.builder().id(1L).concert(concert).user(user)
 				.createdAt(LocalDateTime.now()).build());
 		
-		when(userService.readUser(userId)).thenReturn(user);
-		when(userService.readConcertWishlistsByUserId(userId)).thenReturn(concertWishlists);
+		when(userService.findUserByUserId(userId)).thenReturn(user);
+		when(userService.findConcertWishlistsByUserId(userId)).thenReturn(concertWishlists);
 		
 		MvcResult result = mockMvc.perform(get("/api/users/{userId}/concert-wishlists", userId)
 				.accept(MediaType.APPLICATION_JSON))
@@ -355,7 +395,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	
 	@Test
 	@DisplayName("회원 1명의 아티스트 찜 목록 조회")
-	void readArtistWishlistsByUserId() throws Exception {
+	void getArtistWishlistsByUserId() throws Exception {
 		Long userId = 1L;
 		
 		Artist artist = Artist.builder().id(1L).name("아이유")
@@ -365,8 +405,8 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				ArtistWishlist.builder().id(1L).artist(artist).user(user)
 				.createdAt(LocalDateTime.now()).build());
 		
-		when(userService.readUser(userId)).thenReturn(user);
-		when(userService.readArtistWishlistsByUserId(userId)).thenReturn(artistWishlists);
+		when(userService.findUserByUserId(userId)).thenReturn(user);
+		when(userService.findArtistWishlistsByUserId(userId)).thenReturn(artistWishlists);
 		
 		MvcResult result = mockMvc.perform(get("/api/users/{userId}/artist-wishlists", userId)
 				.accept(MediaType.APPLICATION_JSON))
@@ -388,7 +428,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	
 	@Test
 	@DisplayName("회원 1명이 예매한 공연 목록 조회")
-	void readReservationsByUserId() throws Exception {
+	void getReservationsByUserId() throws Exception {
 		Long userId = 1L;
 		
 		Place place = Place.builder().id(1L).name("KSPO DOME")
@@ -412,8 +452,8 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				Reservation.builder().id(1L).seat(seat).user(user).deposited(true)
 				.createdAt(LocalDateTime.now()).build());
 	
-		when(userService.readUser(userId)).thenReturn(user);
-		when(userService.readReservationsByUserId(userId)).thenReturn(reservations);
+		when(userService.findUserByUserId(userId)).thenReturn(user);
+		when(userService.findReservationsByUserId(userId)).thenReturn(reservations);
 		
 		MvcResult result = mockMvc.perform(get("/api/users/{userId}/reservations", userId)
 				.accept(MediaType.APPLICATION_JSON))

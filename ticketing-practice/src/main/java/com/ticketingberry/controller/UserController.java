@@ -63,7 +63,7 @@ public class UserController {
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	public User getUser(@PathVariable("userId") Long userId) {
-		return userService.readUser(userId);
+		return userService.findUserByUserId(userId);
 	}
 	
 	// 회원 정보 수정
@@ -91,7 +91,7 @@ public class UserController {
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	public List<Article> getArticlesByUserId(@PathVariable("userId") Long userId) {
-		return userService.readArticlesByUserId(userId);
+		return userService.findArticlesByUserId(userId);
 	}
 	
 	// 회원 1명이 작성한 게시글 댓글 목록 조회
@@ -100,7 +100,7 @@ public class UserController {
 	@ResponseBody
 	public List<ArticleComment> getArticleCommentsByUserId(
 			@PathVariable("userId") Long userId) {		
-		return userService.readArticleCommentsByUserId(userId);
+		return userService.findArticleCommentsByUserId(userId);
 	}
 	
 	// 회원 1명이 작성한 콘서트 댓글 목록 조회
@@ -109,7 +109,7 @@ public class UserController {
 	@ResponseBody
 	public List<ConcertComment> getConcertCommentsByUserId(
 			@PathVariable("userId") Long userId) {		
-		return userService.readConcertCommentsByUserId(userId);
+		return userService.findConcertCommentsByUserId(userId);
 	}
 	
 	// 회원 1명의 콘서트 찜 목록 조회
@@ -118,7 +118,7 @@ public class UserController {
 	@ResponseBody
 	public List<ConcertWishlist> getConcertWishlistsByUserId(
 			@PathVariable("userId") Long userId) {
-		return userService.readConcertWishlistsByUserId(userId);
+		return userService.findConcertWishlistsByUserId(userId);
 	}
 	
 	// 회원 1명의 아티스트 찜 목록 조회
@@ -127,7 +127,7 @@ public class UserController {
 	@ResponseBody
 	public List<ArtistWishlist> getArtistWishlistsByUserId(
 			@PathVariable("userId") Long userId) {
-		return userService.readArtistWishlistsByUserId(userId);
+		return userService.findArtistWishlistsByUserId(userId);
 	}
 	
 	// 회원 1명이 예매한 공연 목록 조회
@@ -136,7 +136,7 @@ public class UserController {
 	@ResponseBody
 	public List<Reservation> getReservationsByUserId(
 			@PathVariable("userId") Long userId) {
-		return userService.readReservationsByUserId(userId);
+		return userService.findReservationsByUserId(userId);
 	}
 }
 

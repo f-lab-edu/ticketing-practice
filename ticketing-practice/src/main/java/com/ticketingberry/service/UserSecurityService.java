@@ -24,10 +24,11 @@ public class UserSecurityService implements UserDetailsService {
 	private final UserRepository userRepository;
 
 	@Override
+	// 회원 가입된 username으로 권한 얻어오기
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		@SuppressWarnings("serial")
 		User user = userRepository.findByUsername(username)
-					.orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다.") {});
+					.orElseThrow(() -> new UsernameNotFoundException("username: " + username + " 회원을 찾을 수 없습니다.") {});
 		
 		// 자바 내장 클래스 GrantedAutority 자료형으로 리스트를 만듦
 		// UserRole에서 권한(ADMIN or USER)을 얻어와서 넣기 위한 용도
