@@ -52,9 +52,10 @@ https://chisel-sleet-47c.notion.site/3e9211b2596e4e02bd79cc41c83443aa?v=e87b5508
 ![테스트 커버리지 100%](https://github.com/user-attachments/assets/3a767376-2130-4e34-96e4-2386e1acad33)
 
 ### #7 공연 예매 관련 Entity 기능 구현 및 Test Code 작성
-공연 예매 관련 Entity 목록
-- Place
-- Concert (Place 참조)
-- District (Concert 참조)
-- Seat (District 참조)
-- Reservation (User, Seat 참조)
+- 공연 예매 관련 Entity 목록: 
+- [ ] Place
+- [ ] Concert (Place 참조)
+- [ ] District (Concert 참조)
+- [ ] Seat (District 참조)
+- [ ] Reservation (User, Seat 참조)
+- Controller의 Response를 Entity에서 Dto로 변경
