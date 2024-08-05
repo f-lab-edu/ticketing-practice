@@ -51,14 +51,12 @@ public class UserService {
 		
 		// username으로 회원 조회가 된 경우 중복 객체이므로 409(CONFLICT) 던지기
 		userRepository.findByUsername(userDto.getUsername()).ifPresent(duplicatedUser -> {
-			throw new DataDuplicatedException("username: " + userDto.getUsername() + "은 이미 존재하는 회원입니다.");
+			throw new DataDuplicatedException("username: <" + duplicatedUser.getUsername() + ">은 이미 존재하는 회원입니다.");
 		});
 		
 		// Dto에서 Entity로 변환
 		User user = UserDto.toEntity(userDto, passwordEncoder);
-		
 		User createdUser = userRepository.save(user);
-		
 		return createdUser.getId();
 	}
 	
@@ -80,7 +78,7 @@ public class UserService {
 	@Transactional
 	public User findUserByUsername(String username) {
 		return userRepository.findByUsername(username)
-				.orElseThrow(() -> new DataNotFoundException("username: " + username + " 회원을 찾을 수 없습니다."));
+				.orElseThrow(() -> new DataNotFoundException("username: <" + username + "> 회원을 찾을 수 없습니다."));
 	}
 	
 	// 회원 수정
