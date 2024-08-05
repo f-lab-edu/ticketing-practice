@@ -120,7 +120,7 @@ public class UserServiceTest {
 		DataDuplicatedException exception = assertThrows(DataDuplicatedException.class,
 										() -> userService.createUser(userDto));
 		
-		assertEquals("username: testuser은 이미 존재하는 회원입니다.", exception.getMessage());;
+		assertEquals("username: <testuser>은 이미 존재하는 회원입니다.", exception.getMessage());;
 	}
 	
 	@Test
@@ -175,7 +175,7 @@ public class UserServiceTest {
 		DataNotFoundException exception = assertThrows(DataNotFoundException.class,
 										  () -> userService.findUserByUsername("testuser"));
 	
-		assertEquals("username: testuser 회원을 찾을 수 없습니다.", exception.getMessage());
+		assertEquals("username: <testuser> 회원을 찾을 수 없습니다.", exception.getMessage());
 	}
 	
 	@Test
@@ -215,10 +215,8 @@ public class UserServiceTest {
 	@Test
 	@DisplayName("회원 1명이 작성한 게시글 목록 조회 성공")
 	void readArticlesByUserId_success() {
-		Article article1 = new Article();
-		article1.setUser(user);
-		Article article2 = new Article();
-		article2.setUser(user);
+		Article article1 = Article.builder().user(user).build();
+		Article article2 = Article.builder().user(user).build();
 		
 		List<Article> articles = List.of(article1, article2);
 		
@@ -235,10 +233,8 @@ public class UserServiceTest {
 	@Test
 	@DisplayName("회원 1명이 작성한 게시글 댓글 목록 조회 성공")
 	void readArticleCommentsByUserId_success() {
-		ArticleComment articleComment1 = new ArticleComment();
-		articleComment1.setUser(user);
-		ArticleComment articleComment2 = new ArticleComment();
-		articleComment1.setUser(user);
+		ArticleComment articleComment1 = ArticleComment.builder().user(user).build();
+		ArticleComment articleComment2 = ArticleComment.builder().user(user).build();
 		
 		List<ArticleComment> articleComments = List.of(articleComment1, articleComment2);
 		
@@ -255,10 +251,8 @@ public class UserServiceTest {
 	@Test
 	@DisplayName("회원 1명이 작성한 콘서트 댓글 목록 조회 성공")
 	void readConcertCommentsByUserId_success() {
-		ConcertComment concertComment1 = new ConcertComment();
-		concertComment1.setUser(user);
-		ConcertComment concertComment2 = new ConcertComment();
-		concertComment2.setUser(user);
+		ConcertComment concertComment1 = ConcertComment.builder().user(user).build();
+		ConcertComment concertComment2 = ConcertComment.builder().user(user).build();
 		
 		List<ConcertComment> concertComments = List.of(concertComment1, concertComment2);
 		
@@ -275,10 +269,8 @@ public class UserServiceTest {
 	@Test
 	@DisplayName("회원 1명의 콘서트 찜 목록 조회 성공")
 	void readConcertWishlistsByUserId_success() {
-		ConcertWishlist concertWishlist1 = new ConcertWishlist();
-		concertWishlist1.setUser(user);
-		ConcertWishlist concertWishlist2 = new ConcertWishlist();
-		concertWishlist2.setUser(user);
+		ConcertWishlist concertWishlist1 = ConcertWishlist.builder().user(user).build();
+		ConcertWishlist concertWishlist2 = ConcertWishlist.builder().user(user).build();
 		
 		List<ConcertWishlist> concertWishlists = List.of(concertWishlist1, concertWishlist2);
 		
@@ -295,10 +287,8 @@ public class UserServiceTest {
 	@Test
 	@DisplayName("회원 1명의 아티스트 찜 목록 조회 성공")
 	void readArtistWishlistsByUserId_success() {
-		ArtistWishlist artistWishlist1 = new ArtistWishlist();
-		artistWishlist1.setUser(user);
-		ArtistWishlist artistWishlist2 = new ArtistWishlist();
-		artistWishlist2.setUser(user);
+		ArtistWishlist artistWishlist1 = ArtistWishlist.builder().user(user).build();
+		ArtistWishlist artistWishlist2 = ArtistWishlist.builder().user(user).build();
 		
 		List<ArtistWishlist> artistWishlists = List.of(artistWishlist1, artistWishlist2);
 		
@@ -315,10 +305,8 @@ public class UserServiceTest {
 	@Test
 	@DisplayName("회원 1명의 예매 목록 조회 성공")
 	void readReservationsByUserId_success() {
-		Reservation reservation1 = new Reservation();
-		reservation1.setUser(user);
-		Reservation reservation2 = new Reservation();
-		reservation2.setUser(user);
+		Reservation reservation1 = Reservation.builder().user(user).build();
+		Reservation reservation2 = Reservation.builder().user(user).build();
 		
 		List<Reservation> reservations = List.of(reservation1, reservation2);
 		
