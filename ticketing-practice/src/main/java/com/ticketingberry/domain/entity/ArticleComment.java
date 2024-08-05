@@ -13,14 +13,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @Entity
 @Builder
 @NoArgsConstructor
@@ -29,7 +28,7 @@ import lombok.Setter;
 public class ArticleComment {	// 게시글의 댓글 테이블
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "article_comment_id", nullable = false)
+	@Column(name = "article_comment_id")
 	private long id;		// 게시글의 댓글 고유 id (1부터 자동 증가)
 	
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -38,11 +37,11 @@ public class ArticleComment {	// 게시글의 댓글 테이블
 	@ManyToOne(fetch = FetchType.LAZY)
 	private User user;		// 게시글의 댓글을 작성한 회원
 	
-	@Column(length = 5000, nullable = false)
+	@NotNull
+	@Column(length = 5000)
 	private String content;		// 게시글의 댓글 내용
 	
 	@CreationTimestamp
-	@Column(nullable = false)
 	private LocalDateTime createdAt;	// 게시글의 댓글 객체 생성 시간
 	
 	@LastModifiedDate
