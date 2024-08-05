@@ -1,5 +1,6 @@
 package com.ticketingberry.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -41,29 +42,51 @@ public class UserController {
 	public String addUser(@Valid @RequestBody UserDto userDto) {
 		// 유효성 검사를 통과한 경우 사용자 생성
 		Long userId = userService.createUser(userDto);
-		
-		// 생성된 사용자 정보를 조회하여 문자열 형태로 생성
-		String userRepresentation = "회원(id: " + userId + ") 가입에 성공했습니다.";
-
-		// 정상적으로 회원 생성됐을 경우 201(생성됨)과 응답 본문 반환
-		return userRepresentation;
+		// 정상적으로 회원 생성됐을 경우 201(생성됨)과 생성된 엔터티의 id를 응답 본문으로 반환
+		return "회원(id: " + userId + ") 가입에 성공했습니다.";
 	}
 	
 	// 전체 회원 목록 조회
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public List<User> getAllUsers() {
+	public List<UserDto> getAllUsers() {
+		List<User> userList = userService.readAllUsers();
+		List<UserDto> userDtoList = new ArrayList<>();
+		
+		for (User user : userList) {
+			UserDto userDto = UserDto.builder()
+					.username(user.getUsername())
+					.nickname(user.getNickname())
+					.email(user.getEmail())
+					.phone(user.getPhone())
+					.birth(user.getBirth())
+					.gender(user.getGender())
+					.role(user.getRole())
+					.build();
+			userDtoList.add(userDto);
+		}
+		
 		// 정상적으로 수행됐을 경우 200(성공)과 조회된 객체 반환
-		return userService.readAllUsers();
+		return userDtoList;
 	}
 	
 	// 회원 1명 조회
 	@GetMapping("/{userId}")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public User getUser(@PathVariable("userId") Long userId) {
-		return userService.findUserByUserId(userId);
+	public UserDto getUser(@PathVariable("userId") Long userId) {
+		User user = userService.findUserByUserId(userId);
+		UserDto userDto = UserDto.builder()
+				.username(user.getUsername())
+				.nickname(user.getNickname())
+				.email(user.getEmail())
+				.phone(user.getPhone())
+				.birth(user.getBirth())
+				.gender(user.getGender())
+				.role(user.getRole())
+				.build();
+		return userDto;
 	}
 	
 	// 회원 정보 수정
@@ -71,7 +94,7 @@ public class UserController {
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	public String modifyUser(@PathVariable("userId") Long userId,
-			@Valid @RequestBody UpdateUserDto userUpdateDto) {
+							 @Valid @RequestBody UpdateUserDto userUpdateDto) {
 		userService.updateUser(userId, userUpdateDto);
 		return "회원 수정에 성공했습니다.";
 	}
