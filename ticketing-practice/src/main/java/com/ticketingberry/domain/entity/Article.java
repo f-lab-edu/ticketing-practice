@@ -21,7 +21,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-// 커밋 없어짐 테스트: @Setter를 지우는 것이었음
 @Entity
 @Builder
 @NoArgsConstructor
