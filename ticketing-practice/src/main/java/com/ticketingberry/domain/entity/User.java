@@ -75,7 +75,6 @@ public class User {		// 회원 테이블
 	@Enumerated(EnumType.STRING)
 	private UserRole role;			// 회원 역할
 	
-	@NotNull
 	@CreationTimestamp					// default값: 현재 시간
 	private LocalDateTime createdAt;	// 회원 객체 생성 시간
 	
