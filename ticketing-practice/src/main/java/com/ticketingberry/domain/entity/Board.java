@@ -11,14 +11,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @Entity
 @Builder
 @NoArgsConstructor
@@ -27,14 +26,14 @@ import lombok.Setter;
 public class Board {	// 게시판 테이블
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "board_id", nullable = false)
+	@Column(name = "board_id")
 	private long id;	// 게시판 고유 id (1부터 자동 증가)
 	
-	@Column(length = 50, nullable = false)
+	@NotNull
+	@Column(length = 50)
 	private String name;	// 게시판 이름
 	
 	@CreationTimestamp
-	@Column(nullable = false)
 	private LocalDateTime createdAt;	// 게시판 객체 생성 시간
 	
 	@LastModifiedDate
