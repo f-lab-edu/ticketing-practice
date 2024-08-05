@@ -121,7 +121,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	@Test
 	@DisplayName("회원 가입: username으로 회원 조회가 된 경우 중복 객체이므로 409(CONFLICT) 응답")
 	void addUser_whenUsernameAlreadyExists_throwsConflict() throws Exception {		
-		Mockito.doThrow(new DataDuplicatedException("username: " + userDto.getUsername() + "은 이미 존재하는 회원입니다."))
+		Mockito.doThrow(new DataDuplicatedException("username: <" + userDto.getUsername() + ">은 이미 존재하는 회원입니다."))
 		.when(userService).createUser(any(UserDto.class));
 		
 		// API 호출 및 테스트
@@ -129,7 +129,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(userDto)))
 				.andExpect(status().isConflict())
-				.andExpect(jsonPath("$.message", is("username: " + userDto.getUsername() + "은 이미 존재하는 회원입니다.")))
+				.andExpect(jsonPath("$.message", is("username: <" + userDto.getUsername() + ">은 이미 존재하는 회원입니다.")))
 				.andExpect(jsonPath("$.status", is(409)));
 				
 	}
