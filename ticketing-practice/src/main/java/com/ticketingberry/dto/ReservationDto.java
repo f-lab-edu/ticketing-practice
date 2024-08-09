@@ -1,5 +1,7 @@
 package com.ticketingberry.dto;
 
+import com.ticketingberry.domain.entity.Reservation;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,4 +20,12 @@ public class ReservationDto {
 	private Long userId;
 	
 	private boolean deposited;
+	
+	public static ReservationDto of(Reservation reservation) {
+		return ReservationDto.builder()
+				.seatId(reservation.getSeat().getId())
+				.userId(reservation.getUser().getId())
+				.deposited(reservation.isDeposited())
+				.build();
+	}
 }
