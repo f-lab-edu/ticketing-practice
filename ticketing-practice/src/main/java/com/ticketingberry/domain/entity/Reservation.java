@@ -6,6 +6,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.stereotype.Component;
 
+import com.ticketingberry.dto.ReservationDto;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -46,4 +48,16 @@ public class Reservation {	// 예매 테이블
 	
 	@LastModifiedDate
 	private LocalDateTime updatedAt;	// 예매 객체 수정 시간
+	
+	public static Reservation of(ReservationDto reservationDto, Seat seat, User user) {
+		return Reservation.builder()
+				.seat(seat)
+				.user(user)
+				.deposited(reservationDto.isDeposited())
+				.build();
+	}
+	
+	public void update(boolean deposited) {
+		this.deposited = deposited;
+	}
 }

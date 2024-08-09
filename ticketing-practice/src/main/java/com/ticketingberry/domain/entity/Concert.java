@@ -78,6 +78,17 @@ public class Concert {	// 콘서트(공연) 테이블
 	@LastModifiedDate
 	private LocalDateTime updatedAt;	// 공연 객체 수정 시간
 	
+	public static Concert of(ConcertDto concertDto, Place place, Artist artist) {
+		return Concert.builder()
+				.place(place)
+				.artist(artist)
+				.title(concertDto.getTitle())
+				.content(concertDto.getContent())
+				.openedTicketAt(concertDto.getOpenedTicketAt())
+				.performedAt(concertDto.getPerformedAt())
+				.build();
+	}
+	
 	public void update(ConcertDto concertDto) {
 		this.title = concertDto.getTitle();
 		this.content = concertDto.getContent();

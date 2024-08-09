@@ -7,6 +7,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.stereotype.Component;
 
+import com.ticketingberry.dto.DistrictDto;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,4 +51,11 @@ public class District {		// 구역 테이블
 	
 	@LastModifiedDate
 	private LocalDateTime updatedAt;	// 구역 객체 수정 시간
+	
+	public static District of(DistrictDto districtDto, Concert concert) {
+		return District.builder()
+				.concert(concert)
+				.districtName(districtDto.getDistrictName())
+				.build();
+	}
 }

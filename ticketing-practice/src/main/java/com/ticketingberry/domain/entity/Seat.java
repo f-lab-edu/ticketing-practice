@@ -6,6 +6,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.stereotype.Component;
 
+import com.ticketingberry.dto.SeatDto;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -45,4 +47,12 @@ public class Seat {	// 좌석 테이블
 	
 	@LastModifiedDate
 	private LocalDateTime updatedAt;	// 좌석 객체 수정 시간
+	
+	public static Seat of(SeatDto seatDto, District district) {
+		return Seat.builder()
+				.district(district)
+				.rowNum(seatDto.getRowNum())
+				.seatNum(seatDto.getSeatNum())
+				.build();
+	}
 }
