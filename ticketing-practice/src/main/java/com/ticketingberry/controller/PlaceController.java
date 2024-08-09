@@ -1,7 +1,7 @@
 package com.ticketingberry.controller;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/places")
+@RequestMapping("/places")
 public class PlaceController {
 	private final PlaceService placeService;
 	
@@ -32,9 +32,9 @@ public class PlaceController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	@ResponseBody
-	public String addPlace(@Valid @RequestBody PlaceDto placeDto) {
-		Long placeId = placeService.createPlace(placeDto);
-		return "장소(id: " + placeId + ") 추가에 성공했습니다.";
+	public PlaceDto addPlace(@Valid @RequestBody PlaceDto placeDto) {
+		Place place = placeService.create(placeDto);
+		return PlaceDto.of(place);
 	}
 	
 	// 전체 공연 장소 목록 조회
@@ -42,17 +42,10 @@ public class PlaceController {
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	public List<PlaceDto> getAllPlaces() {
-		List<Place> placeList = placeService.findAllPlaces();
-		List<PlaceDto> placeDtoList = new ArrayList<>();
-		
-		for (Place place : placeList) {
-			PlaceDto placeDto = PlaceDto.builder()
-					.name(place.getName())
-					.build();
-			placeDtoList.add(placeDto);
-		}
-		
-		return placeDtoList;
+		List<Place> placeList = placeService.findAll();
+		return placeList.stream()
+				.map(place -> PlaceDto.of(place))
+				.collect(Collectors.toList());
 	}
 	
 	// 공연 장소 1개 조회
@@ -60,29 +53,26 @@ public class PlaceController {
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	public PlaceDto getPlace(@PathVariable("placeId") Long placeId) {
-		Place place = placeService.findPlaceById(placeId);
-		PlaceDto placeDto = PlaceDto.builder()
-				.name(place.getName())
-				.build();
-		return placeDto;
+		Place place = placeService.findById(placeId);
+		return PlaceDto.of(place);
 	}
 	
 	// 공연 장소 정보 수정
 	@PutMapping("/{placeId}")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public String modifyPlace(@PathVariable("placeId") Long placeId,
+	public PlaceDto modifyPlace(@PathVariable("placeId") Long placeId,
 							  @Valid @RequestBody PlaceDto placeDto) {
-		placeService.updatePlace(placeId, placeDto);
-		return "장소 수정에 성공했습니다.";
+		Place place = placeService.update(placeId, placeDto);
+		return PlaceDto.of(place);
 	}
 	
 	// 공연 장소 삭제
 	@DeleteMapping("/{placeId}")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public String removePlace(@PathVariable("placeId") Long placeId) {
-		placeService.deletePlace(placeId);
-		return "장소(id: " + placeId + ") 삭제에 성공했습니다.";
+	public PlaceDto removePlace(@PathVariable("placeId") Long placeId) {
+		Place place = placeService.delete(placeId);
+		return PlaceDto.of(place);
 	}
 }

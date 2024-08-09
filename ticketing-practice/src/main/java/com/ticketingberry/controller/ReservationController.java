@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ticketingberry.domain.entity.Reservation;
 import com.ticketingberry.dto.ReservationDto;
 import com.ticketingberry.service.ReservationService;
 
@@ -22,8 +23,8 @@ public class ReservationController {
 	@PostMapping("/reservation")
 	@ResponseStatus(HttpStatus.CREATED)
 	@ResponseBody
-	public String addReservation(@Valid @RequestBody ReservationDto reservationDto) {
-		Long reservationId = reservationService.createReservation(reservationDto);
-		return "예매(id: " + reservationId + ")에 성공했습니다.";
+	public ReservationDto addReservation(@Valid @RequestBody ReservationDto reservationDto) {
+		Reservation reservation = reservationService.createReservation(reservationDto);
+		return ReservationDto.of(reservation);
 	}
 }
