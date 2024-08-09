@@ -17,10 +17,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @Entity
 @Builder
 @NoArgsConstructor
@@ -29,7 +27,7 @@ import lombok.Setter;
 public class ConcertWishlist {	// 콘서트(공연) 찜 테이블
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "concert_wishlist_id", nullable = false)
+	@Column(name = "concert_wishlist_id")
 	private long id;		//  공연 찜 고유 id (1부터 자동 증가)
 	
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -39,7 +37,6 @@ public class ConcertWishlist {	// 콘서트(공연) 찜 테이블
 	private User user;			// 공연 찜을 소유하고 있는 회원
 	
 	@CreationTimestamp
-	@Column(nullable = false)
 	private LocalDateTime createdAt;	// 공연 찜 객체 생성 시간
 	
 	@LastModifiedDate

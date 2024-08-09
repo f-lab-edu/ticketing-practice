@@ -1,7 +1,5 @@
 package com.ticketingberry.dto;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import com.ticketingberry.domain.UserRole;
 import com.ticketingberry.domain.entity.User;
 
@@ -55,17 +53,15 @@ public class UserDto {	// 회원 생성 DTO
 	@Builder.Default
 	private UserRole role = USER;	// 회원가입하는 모든 사람들은 회원 권한을 가짐
 	
-	// 엔티티 생성 정적 메서드
-	public static User toEntity(UserDto userDto, PasswordEncoder passwordEncoder) {
-		return User.builder()
-				.username(userDto.getUsername())
-				.password(passwordEncoder.encode(userDto.getPassword1()))
-				.nickname(userDto.getNickname())
-				.email(userDto.getEmail())
-				.phone(userDto.getPhone())
-				.birth(userDto.getBirth())
-				.gender(userDto.getGender())
-				.role(userDto.getRole())
+	public static UserDto of(User user) {
+		return UserDto.builder()
+				.username(user.getUsername())
+				.nickname(user.getNickname())
+				.email(user.getEmail())
+				.phone(user.getPhone())
+				.birth(user.getBirth())
+				.gender(user.getGender())
+				.role(user.getRole())
 				.build();
 	}
 }

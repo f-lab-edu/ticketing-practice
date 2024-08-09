@@ -16,10 +16,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @Entity
 @Builder
 @NoArgsConstructor
@@ -28,7 +26,7 @@ import lombok.Setter;
 public class Image {	// 사진 테이블
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "image_id", nullable = false)
+	@Column(name = "image_id")
 	private long id;	// 사진 고유 id (1부터 자동 증가)
 	
 	@Column
@@ -43,7 +41,6 @@ public class Image {	// 사진 테이블
 	private byte[] compressedData;		// Base64로 압축한 사진 데이터
 	
 	@CreationTimestamp
-	@Column(nullable = false)
 	private LocalDateTime createdAt;	// 사진 객체 생성 시간
 	
 	@LastModifiedDate

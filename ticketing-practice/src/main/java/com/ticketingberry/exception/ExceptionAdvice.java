@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.ticketingberry.exception.custom.DataDuplicatedException;
 import com.ticketingberry.exception.custom.DataNotFoundException;
+import com.ticketingberry.exception.custom.InvalidDateException;
 import com.ticketingberry.exception.custom.PasswordsUnequalException;
 
 @RestControllerAdvice
@@ -34,5 +35,13 @@ public class ExceptionAdvice {
 	@ResponseBody
 	public ErrorResponse DataDuplicatedExceptionHandler(DataDuplicatedException e) {
 		return new ErrorResponse(e.getMessage(), HttpStatus.CONFLICT.value());
+	}
+	
+	// 400(잘못된 요청): 요청의 구문이 잘못되었다.
+	@ExceptionHandler(InvalidDateException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ResponseBody
+	public ErrorResponse InvalidDateExceptionHandler(InvalidDateException e) {
+		return new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST.value());
 	}
 }
