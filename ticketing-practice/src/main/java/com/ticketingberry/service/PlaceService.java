@@ -19,39 +19,37 @@ public class PlaceService {
 	
 	// 공연 장소 추가
 	@Transactional
-	public Long createPlace(PlaceDto placeDto) {
-		Place place = Place.builder()
-				.name(placeDto.getName())
-				.build();
-		Place createdPlace = placeRepository.save(place);
-		return createdPlace.getId();
+	public Place create(PlaceDto placeDto) {
+		Place place = Place.of(placeDto);
+		return placeRepository.save(place);
 	}
 	
 	// 전체 공연 장소 목록 조회
 	@Transactional
-	public List<Place> findAllPlaces() {
+	public List<Place> findAll() {
 		return placeRepository.findAll();
 	}
 	
 	// 공연 1개 조회
 	@Transactional
-	public Place findPlaceById(Long placeId) {
+	public Place findById(Long placeId) {
 		return placeRepository.findById(placeId)
 				.orElseThrow(() -> new DataNotFoundException("장소를 찾을 수 없습니다."));
 	}
 	
 	// 공연 장소 수정
 	@Transactional
-	public void updatePlace(Long placeId, PlaceDto placeDto) {
-		Place place = findPlaceById(placeId);
+	public Place update(Long placeId, PlaceDto placeDto) {
+		Place place = findById(placeId);
 		place.update(placeDto.getName());
-		placeRepository.save(place);
+		return placeRepository.save(place);
 	}
 	
 	// 공연 장소 삭제
 	@Transactional
-	public void deletePlace(Long placeId) {
-		Place place = findPlaceById(placeId);
+	public Place delete(Long placeId) {
+		Place place = findById(placeId);
 		placeRepository.delete(place);
+		return place;
 	}
 }

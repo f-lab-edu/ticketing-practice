@@ -22,35 +22,28 @@ public class DistrictService {
 	
 	// 구역 추가
 	@Transactional
-	public Long createDistrict(Long concertId, DistrictDto districtDto) {
-		Concert concert = findConcertByConcertId(concertId);
-		
-		District district = District.builder()
-				.concert(concert)
-				.districtName(districtDto.getDistrictName())
-				.build();
-		
-		District createdDistrict = districtRepository.save(district);
-		return createdDistrict.getId();
+	public District create(DistrictDto districtDto, Concert concert) {
+		District district = District.of(districtDto, concert);
+		return districtRepository.save(district);
 	}
 	
 	// 1개의 콘서트에 해당하는 구역 리스트 조회
 	@Transactional
-	public List<District> findDistrictsByConcertId(Long concertId) {
-		Concert concert = findConcertByConcertId(concertId);
+	public List<District> findListByConcertId(Long concertId) {
+		Concert concert = findConcert(concertId);
 		return districtRepository.findByConcert(concert);
 	}
 	
 	// 1개의 구역 조회
 	@Transactional
-	public District findDistrictByDistrictId(Long districtId) {
+	public District findById(Long districtId) {
 		return districtRepository.findById(districtId)
 				.orElseThrow(() -> new DataNotFoundException("구역을 찾을 수 없습니다."));
 	}
 	
 	// concertId로 콘서트 조회
 	@Transactional
-	private Concert findConcertByConcertId(Long concertId) {
+	private Concert findConcert(Long concertId) {
 		return concertRepository.findById(concertId)
 				.orElseThrow(() -> new DataNotFoundException("공연을 찾을 수 없습니다."));
 	}

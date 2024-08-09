@@ -27,60 +27,60 @@ public class ConcertService {
 	
 	// 공연 추가
 	@Transactional
-	public Long createConcert(ConcertDto concertDto) {
-		LocalDateTime openedTicketAt = concertDto.getOpenedTicketAt();
-		LocalDateTime performedAt = concertDto.getPerformedAt();
+	public Concert create(ConcertDto concertDto) {
 		// 공연이 시작하는 날짜가 공연 예매가 열리는 날짜보다 빠르면 예외 던지게 하기
-		checkValidDate(openedTicketAt, performedAt);
+		checkValidDate(concertDto.getOpenedTicketAt(), concertDto.getPerformedAt());
 		
-		Place place = placeRepository.findById(concertDto.getPlaceId())
-				.orElseThrow(() -> new DataNotFoundException("장소를 찾을 수 없습니다."));
+		Place place = findPlace(concertDto.getPlaceId());
+		Artist artist = findArtist(concertDto.getArtistId());
 		
-		Artist artist = artistRepository.findById(concertDto.getArtistId())
-				.orElseThrow(() -> new DataNotFoundException("아티스트를 찾을 수 없습니다."));
-		
-		Concert concert = Concert.builder()
-				.place(place)
-				.artist(artist)
-				.title(concertDto.getTitle())
-				.content(concertDto.getContent())
-				.openedTicketAt(openedTicketAt)
-				.performedAt(performedAt)
-				.build();
-		
-		Concert createdConcert = concertRepository.save(concert);
-		return createdConcert.getId();
+		Concert concert = Concert.of(concertDto, place, artist);
+		return concertRepository.save(concert);
 	}
 	
 	// 전체 공연 목록 조회
 	@Transactional
-	public List<Concert> findAllConcerts() {
+	public List<Concert> findAll() {
 		return concertRepository.findAll();
 	}
 	
 	// 공연 1개 조회
 	@Transactional
-	public Concert findConcertByConcertId(Long concertId) {
+	public Concert findById(Long concertId) {
 		return concertRepository.findById(concertId)
 				.orElseThrow(() -> new DataNotFoundException("공연을 찾을 수 없습니다."));
 	}
 	
+	// 1개의 장소에 해당하는 공연 리스트 조회
+	@Transactional
+	public List<Concert> findListByPlaceId(Long placeId) {
+		Place place = findPlace(placeId);
+		return concertRepository.findByPlace(place);
+	}
+	
+	// 1팀의 아티스트에 해당하는 공연 리스트 조회
+	@Transactional
+	public List<Concert> findListByArtistId(Long artistId) {
+		Artist artist = findArtist(artistId);
+		return concertRepository.findByArtist(artist);
+	}
+	
 	// 공연 수정
 	@Transactional
-	public void updateConcert(Long concertId, ConcertDto concertDto) {
+	public Concert update(Long concertId, ConcertDto concertDto) {
 		// 공연이 시작하는 날짜가 공연 예매가 열리는 날짜보다 빠르면 예외 던지게 하기 
 		checkValidDate(concertDto.getOpenedTicketAt(), concertDto.getPerformedAt());
-		
-		Concert concert = findConcertByConcertId(concertId);
+		Concert concert = findById(concertId);
 		concert.update(concertDto);
-		concertRepository.save(concert);
+		return concertRepository.save(concert);
 	}
 	
 	// 공연 삭제
 	@Transactional
-	public void deleteConcert(Long concertId) {
-		Concert concert = findConcertByConcertId(concertId);
+	public Concert delete(Long concertId) {
+		Concert concert = findById(concertId);
 		concertRepository.delete(concert);
+		return concert;
 	}
 	
 	// 공연이 시작하는 날짜가 공연 예매가 열리는 날짜보다 빠르면 예외 던지게 하기
@@ -88,5 +88,17 @@ public class ConcertService {
 		if (performedAt.isBefore(openedTicketAt)) {
 			throw new InvalidDateException("공연이 시작하는 날짜가 공연 예매가 열리는 날짜보다 빠릅니다.");
 		}
+	}
+	
+	@Transactional
+	private Place findPlace(Long placeId) {
+		return placeRepository.findById(placeId)
+				.orElseThrow(() -> new DataNotFoundException("장소를 찾을 수 없습니다."));
+	}
+	
+	@Transactional
+	private Artist findArtist(Long artistId) {
+		return artistRepository.findById(artistId)
+				.orElseThrow(() -> new DataNotFoundException("아티스트를 찾을 수 없습니다."));
 	}
 }

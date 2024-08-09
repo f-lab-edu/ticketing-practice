@@ -22,36 +22,28 @@ public class SeatService {
 	
 	// 좌석 추가
 	@Transactional
-	public Long createSeat(Long districtId, SeatDto seatDto) {
-		District district = findDistrictByDistrictId(districtId);
-		
-		Seat seat = Seat.builder()
-				.district(district)
-				.rowNum(seatDto.getRowNum())
-				.seatNum(seatDto.getSeatNum())
-				.build();
-		
-		Seat createdSeat = seatRepository.save(seat);
-		return createdSeat.getId();
+	public Seat create(SeatDto seatDto, District district) {
+		Seat seat = Seat.of(seatDto, district);
+		return seatRepository.save(seat);
 	}
 	
 	// 1개의 구역에 해당하는 좌석 리스트 조회
 	@Transactional
-	public List<Seat> findSeatsByDistrictId(Long districtId) {
-		District district = findDistrictByDistrictId(districtId);
+	public List<Seat> findListByDistrictId(Long districtId) {
+		District district = findDistrict(districtId);
 		return seatRepository.findByDistrict(district);
 	}
 	
 	// 1개의 좌석 조회
 	@Transactional
-	public Seat findSeatBySeatId(Long seatId) {
+	public Seat findById(Long seatId) {
 		return seatRepository.findById(seatId)
 				.orElseThrow(() -> new DataNotFoundException("좌석을 찾을 수 없습니다."));
 	}
 	
 	// districtId로 구역 조회
 	@Transactional
-	private District findDistrictByDistrictId(Long districtId) {
+	private District findDistrict(Long districtId) {
 		return districtRepository.findById(districtId)
 				.orElseThrow(() -> new DataNotFoundException("구역을 찾을 수 없습니다."));
 	}
