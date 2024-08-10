@@ -4,9 +4,11 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.ticketingberry.domain.UserRole;
+import com.ticketingberry.dto.UserDto;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -75,12 +77,25 @@ public class User {		// 회원 테이블
 	@Enumerated(EnumType.STRING)
 	private UserRole role;			// 회원 역할
 	
-	@NotNull
 	@CreationTimestamp					// default값: 현재 시간
 	private LocalDateTime createdAt;	// 회원 객체 생성 시간
 	
 	@LastModifiedDate
 	private LocalDateTime updatedAt;	// 회원 객체 수정 시간
+	
+	// 엔티티 생성 정적 메서드
+	public static User of(UserDto userDto, PasswordEncoder passwordEncoder) {
+		return User.builder()
+				.username(userDto.getUsername())
+				.password(passwordEncoder.encode(userDto.getPassword1()))
+				.nickname(userDto.getNickname())
+				.email(userDto.getEmail())
+				.phone(userDto.getPhone())
+				.birth(userDto.getBirth())
+				.gender(userDto.getGender())
+				.role(userDto.getRole())
+				.build();
+	}
 	
 	// 특정 필드만 수정하는 메서드
 	public void update(String nickname, String email, String phone) {
@@ -89,4 +104,3 @@ public class User {		// 회원 테이블
 		this.phone = phone;
 	}
 }
-

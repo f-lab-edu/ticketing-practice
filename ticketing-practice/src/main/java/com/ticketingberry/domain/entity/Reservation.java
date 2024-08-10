@@ -6,6 +6,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.stereotype.Component;
 
+import com.ticketingberry.dto.ReservationDto;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,14 +16,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @Entity
 @Builder
 @NoArgsConstructor
@@ -30,7 +31,7 @@ import lombok.Setter;
 public class Reservation {	// 예매 테이블
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "reservation_id", nullable = false)
+	@Column(name = "reservation_id")
 	private long id;		//  예매 고유 id (1부터 자동 증가)
 	
 	@OneToOne(fetch = FetchType.LAZY)
@@ -39,13 +40,24 @@ public class Reservation {	// 예매 테이블
 	@ManyToOne(fetch = FetchType.LAZY)
 	private User user;		// 예매를 한 회원
 	
-	@Column(nullable = false)
-	private boolean deposited;	// 예매 입금 여부	
+	@NotNull
+	private boolean deposited;	// 예매 입금 여부
 	
 	@CreationTimestamp
-	@Column(nullable = false)
 	private LocalDateTime createdAt;	// 예매 객체 생성 시간
 	
 	@LastModifiedDate
 	private LocalDateTime updatedAt;	// 예매 객체 수정 시간
+	
+	public static Reservation of(ReservationDto reservationDto, Seat seat, User user) {
+		return Reservation.builder()
+				.seat(seat)
+				.user(user)
+				.deposited(reservationDto.isDeposited())
+				.build();
+	}
+	
+	public void update(boolean deposited) {
+		this.deposited = deposited;
+	}
 }
