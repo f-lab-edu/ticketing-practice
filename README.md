@@ -59,3 +59,17 @@ https://chisel-sleet-47c.notion.site/3e9211b2596e4e02bd79cc41c83443aa?v=e87b5508
 - [ ] Seat (District 참조)
 - [ ] Reservation (User, Seat 참조)
 - Controller의 Response를 Entity에서 Dto로 변경
+
+### #9 공연 예매 관련 기능의 Test Code 작성
+- 공연 예매 관련 Service 목록: 
+- [ ] PlaceService
+- [ ] ConcertService
+- [ ] DistrictService
+- [ ] SeatService
+- [ ] ReservationService
+- 공연 예매 관련 Controller 목록: 
+- [ ] PlaceController
+- [ ] ConcertController
+- [ ] DistrictController
+- [ ] SeatController
+- [ ] ReservationController
