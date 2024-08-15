@@ -73,3 +73,6 @@ https://chisel-sleet-47c.notion.site/3e9211b2596e4e02bd79cc41c83443aa?v=e87b5508
 - [ ] DistrictController
 - [ ] SeatController
 - [ ] ReservationController
+- ConcertDto를 InConcertDto와 OutConcertDto로 쪼개기
+- DistrictDto를 InDistrictDto와 OutDistrictDto로 쪼개기
+- SeatDto를 InSeatDto와 OutSeatDto로 쪼개기
