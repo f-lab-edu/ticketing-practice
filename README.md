@@ -60,7 +60,7 @@ https://chisel-sleet-47c.notion.site/3e9211b2596e4e02bd79cc41c83443aa?v=e87b5508
 - [X] Reservation (User, Seat 참조)
 - Controller의 Response를 Entity에서 Dto로 변경
 
-### #9 공연 예매 관련 기능의 Test Code 작성
+### #9 하나의 DTO를 요청DTO과 응답DTO 용도로 책임 분산, 공연 예매 관련 기능의 Test Code 작성
 - 공연 예매 관련 Service 목록: 
 - [X] PlaceService
 - [X] ConcertService
