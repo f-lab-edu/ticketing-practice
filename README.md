@@ -74,10 +74,10 @@ https://chisel-sleet-47c.notion.site/3e9211b2596e4e02bd79cc41c83443aa?v=e87b5508
 - [X] ReservationService
 - 공연 예매 관련 Controller 목록: 
 - [X] PlaceController
-- [ ] ConcertController
-- [ ] DistrictController
-- [ ] SeatController
-- [ ] ReservationController
+- [X] ConcertController
+- [X] DistrictController
+- [X] SeatController
+- [X] ReservationController
 - ConcertDto: ConcertDto 추상 클래스를 상속받는 InConcertDto와 OutConcertDto로 책임 분산
 - DistrictDto: DistrictDto 추상 클래스를 상속받는 InDistrictDto와 OutDistrictDto로 책임 분산
 - SeatDto: 구역 정보를 불러올 때에는 OutSeatDto로 책임 분산
