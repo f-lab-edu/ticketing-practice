@@ -1,9 +1,8 @@
 package com.ticketingberry.service;
 
+import static com.ticketingberry.domain.user.UserRole.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
-import static com.ticketingberry.domain.UserRole.*;
 
 import java.util.Optional;
 
@@ -16,8 +15,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import com.ticketingberry.domain.entity.User;
-import com.ticketingberry.domain.repository.UserRepository;
+import com.ticketingberry.domain.user.User;
+import com.ticketingberry.domain.user.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class UserSecurityServiceTest {
