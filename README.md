@@ -11,12 +11,14 @@
 - 공연 좌석 예매, 예매 취소, 예매 목록 보기
 
 ## 경험 및 성과
-- Spring Boot와 JPA를 사용하여 RESTful API를 설계하고 Spring REST Docs로 문서화하며 테스트 주도 개발(TDD)을 실천
+- SOLID 원칙을 적용하여 코드의 유연성과 재사용성을 극대화하고, 유지보수성을 높여 시스템 확장에 용이하도록 설계
+- Spring Boot와 JPA를 사용하여 RESTful API를 설계하고 Spring REST Docs로 문서화
 - MockMvc, Mockito, JUnit을 사용하여 Spring MVC 컨트롤러와 서비스 계층의 단위 및 통합 테스트를 자동화하여 API 동작을 검증하고 문서화
 - JaCoCo를 사용하여 테스트 커버리지 80% 이상을 달성하여 코드 품질과 안정성을 보장
 - Spring Validation을 활용해 데이터 유효성 검사 및 예외 처리를 구현하여 API 안정성을 강화
 - 데이터베이스 작업에서 예외 처리와 트랜잭션 관리를 통해 데이터 무결성을 유지하고, Spring Security로 보안을 강화
 - ExceptionHandler로 글로벌 예외 처리를 구현하여 각종 예외 상황에 대해 일관된 응답과 API 가용성을 개선
+- 객체 그래프가 순환 형태라면 Proxy 객체로 인해 발생하는 Entity 직렬화 문제를 DTO로 Response하도록 변경하여 해결. 또한, DTO로 Response하면 Entity의 중요한 필드 노출을 숨길 수 있어 보안을 더욱 강화
 
 ## ERD 
 ![티켓팅 연습 웹 ERD](https://github.com/user-attachments/assets/7817fa2b-f31d-4095-9bd0-83e852542dce)
@@ -78,3 +80,7 @@ https://chisel-sleet-47c.notion.site/3e9211b2596e4e02bd79cc41c83443aa?v=e87b5508
 - SeatDto: 구역 정보를 불러올 때에는 OutSeatDto로 책임 분산
 - ReservationDto: ReservationDto 추상 클래스를 상속받는 InReservationDto와 OutReservationDto로 책임 분산
 - UserDto: 회원가입은 InUserDto로 책임 분산
+
+- 공연 예매 관련 기능 모두 테스트 커버리지 측정
+- 테스트 커버리지 클래스 1개 제외하고 나머지는 100% 달성
+![image](https://github.com/user-attachments/assets/2630b397-49d2-4c62-b8f0-70892d900c99)
