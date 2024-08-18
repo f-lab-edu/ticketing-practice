@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ticketingberry.domain.entity.Concert;
-import com.ticketingberry.domain.entity.District;
-import com.ticketingberry.dto.ConcertDto;
+import com.ticketingberry.domain.concert.Concert;
+import com.ticketingberry.domain.district.District;
+import com.ticketingberry.domain.seat.Seat;
+import com.ticketingberry.dto.concert.InConcertDto;
+import com.ticketingberry.dto.concert.OutConcertDto;
 import com.ticketingberry.service.ConcertService;
 import com.ticketingberry.service.DistrictService;
 import com.ticketingberry.service.SeatService;
@@ -35,29 +37,32 @@ public class ConcertController {
 	@PostMapping("/concerts")
 	@ResponseStatus(HttpStatus.CREATED)
 	@ResponseBody
-	public ConcertDto addConcert(@Valid @RequestBody ConcertDto concertDto) {	
+	public OutConcertDto addConcert(@Valid @RequestBody InConcertDto inConcertDto) {	
 		// District 리스트의 값을 제외한 Concert를 우선 저장
-		Concert concert =  concertService.create(concertDto);
+		Concert concert =  concertService.create(inConcertDto);
 		
 		// District와 Seat을 차례대로 저장
-		concertDto.getDistrictDtos().stream()
-		.forEach(districtDto -> {
+		inConcertDto.getDistrictDtos().forEach(districtDto -> {
 			// Seat 리스트의 값을 제외한 District를 우선 저장
 			District district = districtService.create(districtDto, concert);
+			concert.getDistricts().add(district);
+			
 			// Seat을 District에 차례대로 저장
-			districtDto.getSeatDtos().stream()
-			.forEach(seatDto -> seatService.create(seatDto, district));
+			districtDto.getSeatDtos().forEach(seatDto -> {
+				Seat seat = seatService.create(seatDto, district);
+				district.getSeats().add(seat);
+			});
 		});
 		
 		// District와 Seat이 포함된 Concert 엔티티를 DTO로 변환하여 응답 본문으로 반환
-		return ConcertDto.of(concert);
+		return OutConcertDto.of(concert);
 	}
 	
 	// 전체 공연 목록 조회
 	@GetMapping("/concerts")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public List<ConcertDto> getAllConcerts() {
+	public List<OutConcertDto> getAllConcerts() {
 		List<Concert> concertList = concertService.findAll();
 		return entityListToDtoList(concertList);
 	}
@@ -66,16 +71,16 @@ public class ConcertController {
 	@GetMapping("/concerts/{concertId}")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public ConcertDto getConcert(@PathVariable("concertId") Long concertId) {
+	public OutConcertDto getConcert(@PathVariable("concertId") Long concertId) {
 		Concert concert = concertService.findById(concertId);
-		return ConcertDto.of(concert);
+		return OutConcertDto.of(concert);
 	}
 	
 	// 1개의 장소에 해당하는 공연 리스트 조회
 	@GetMapping("/places/{placeId}/concerts")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public List<ConcertDto> getConcertsByPlaceId(@PathVariable("placeId") Long placeId) {
+	public List<OutConcertDto> getConcertsByPlaceId(@PathVariable("placeId") Long placeId) {
 		List<Concert> concertList = concertService.findListByPlaceId(placeId);
 		return entityListToDtoList(concertList);
 	}
@@ -84,7 +89,7 @@ public class ConcertController {
 	@GetMapping("/artists/{artistId}/concerts")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public List<ConcertDto> getConcertsByArtistId(@PathVariable("artistId") Long artistId) {
+	public List<OutConcertDto> getConcertsByArtistId(@PathVariable("artistId") Long artistId) {
 		List<Concert> concertList = concertService.findListByArtistId(artistId);
 		return entityListToDtoList(concertList);
 	}
@@ -93,24 +98,24 @@ public class ConcertController {
 	@PutMapping("/concerts/{concertId}")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public ConcertDto modifyConcert(@PathVariable("concertId") Long concertId,
-								@Valid @RequestBody ConcertDto concertDto) {
-		Concert concert = concertService.update(concertId, concertDto);
-		return ConcertDto.of(concert);
+	public OutConcertDto modifyConcert(@PathVariable("concertId") Long concertId,
+								@Valid @RequestBody InConcertDto inConcertDto) {
+		Concert concert = concertService.update(concertId, inConcertDto);
+		return OutConcertDto.of(concert);
 	}
 	
 	// 공연 삭제
 	@DeleteMapping("/concerts/{concertId}")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public ConcertDto removeConcert(@PathVariable("concertId") Long concertId) {
+	public OutConcertDto removeConcert(@PathVariable("concertId") Long concertId) {
 		Concert concert = concertService.delete(concertId);
-		return ConcertDto.of(concert);
+		return OutConcertDto.of(concert);
 	}
 	
-	private List<ConcertDto> entityListToDtoList(List<Concert> concertList) {
+	private List<OutConcertDto> entityListToDtoList(List<Concert> concertList) {
 		return concertList.stream()
-				.map(concert -> ConcertDto.of(concert))
+				.map(concert -> OutConcertDto.of(concert))
 				.collect(Collectors.toList());
 	}
 }

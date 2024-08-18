@@ -15,9 +15,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ticketingberry.domain.entity.User;
-import com.ticketingberry.dto.UserDto;
-import com.ticketingberry.dto.UpdateUserDto;
+import com.ticketingberry.domain.user.User;
+import com.ticketingberry.dto.user.UpdateUserDto;
+import com.ticketingberry.dto.user.UserDto;
+import com.ticketingberry.dto.user.InUserDto;
 import com.ticketingberry.service.UserService;
 
 import jakarta.validation.Valid;
@@ -33,9 +34,9 @@ public class UserController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	@ResponseBody
-	public UserDto addUser(@Valid @RequestBody UserDto userDto) {
+	public UserDto addUser(@Valid @RequestBody InUserDto inUserDto) {
 		// 유효성 검사를 통과한 경우 사용자 생성
-		User user = userService.create(userDto);
+		User user = userService.create(inUserDto);
 		// 정상적으로 회원 생성됐을 경우 201(생성됨)과 생성된 엔터티를 DTO로 변환하여 응답 본문으로 반환
 		return UserDto.of(user);
 	}
@@ -82,58 +83,5 @@ public class UserController {
 		// 정상적으로 수행됐을 경우 200(성공)과 삭제된 엔터티를 DTO로 변환하여 응답 본문으로 반환
 		return UserDto.of(user);
 	}
-	
-//	// 회원 1명이 작성한 게시글 목록 조회
-//	@GetMapping("/{userId}/articles")
-//	@ResponseStatus(HttpStatus.OK)
-//	@ResponseBody
-//	public List<Article> getArticlesByUserId(@PathVariable("userId") Long userId) {
-//		return userService.findArticlesByUserId(userId);
-//	}
-//	
-//	// 회원 1명이 작성한 게시글 댓글 목록 조회
-//	@GetMapping("/{userId}/article-comments")
-//	@ResponseStatus(HttpStatus.OK)
-//	@ResponseBody
-//	public List<ArticleComment> getArticleCommentsByUserId(
-//			@PathVariable("userId") Long userId) {		
-//		return userService.findArticleCommentsByUserId(userId);
-//	}
-//	
-//	// 회원 1명이 작성한 콘서트 댓글 목록 조회
-//	@GetMapping("/{userId}/concert-comments")
-//	@ResponseStatus(HttpStatus.OK)
-//	@ResponseBody
-//	public List<ConcertComment> getConcertCommentsByUserId(
-//			@PathVariable("userId") Long userId) {		
-//		return userService.findConcertCommentsByUserId(userId);
-//	}
-//	
-//	// 회원 1명의 콘서트 찜 목록 조회
-//	@GetMapping("{userId}/concert-wishlists")
-//	@ResponseStatus(HttpStatus.OK)
-//	@ResponseBody
-//	public List<ConcertWishlist> getConcertWishlistsByUserId(
-//			@PathVariable("userId") Long userId) {
-//		return userService.findConcertWishlistsByUserId(userId);
-//	}
-//	
-//	// 회원 1명의 아티스트 찜 목록 조회
-//	@GetMapping("{userId}/artist-wishlists")
-//	@ResponseStatus(HttpStatus.OK)
-//	@ResponseBody
-//	public List<ArtistWishlist> getArtistWishlistsByUserId(
-//			@PathVariable("userId") Long userId) {
-//		return userService.findArtistWishlistsByUserId(userId);
-//	}
-//	
-//	// 회원 1명이 예매한 공연 목록 조회
-//	@GetMapping("/{userId}/reservations")
-//	@ResponseStatus(HttpStatus.OK)
-//	@ResponseBody
-//	public List<Reservation> getReservationsByUserId(
-//			@PathVariable("userId") Long userId) {
-//		return userService.findReservationsByUserId(userId);
-//	}
 }
 

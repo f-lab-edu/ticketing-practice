@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ticketingberry.domain.entity.Place;
-import com.ticketingberry.dto.PlaceDto;
+import com.ticketingberry.domain.place.Place;
+import com.ticketingberry.dto.place.PlaceDto;
 import com.ticketingberry.service.PlaceService;
 
 import jakarta.validation.Valid;

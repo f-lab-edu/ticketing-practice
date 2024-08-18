@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ticketingberry.domain.entity.Seat;
-import com.ticketingberry.dto.SeatDto;
+import com.ticketingberry.domain.seat.Seat;
+import com.ticketingberry.dto.seat.OutSeatDto;
 import com.ticketingberry.service.SeatService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,19 +25,19 @@ public class SeatController {
 	@GetMapping("/districts/{districtId}/seats")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public List<SeatDto> getSeatsByDistrictId(@PathVariable("districtId") Long districtId) {
+	public List<OutSeatDto> getSeatsByDistrictId(@PathVariable("districtId") Long districtId) {
 		List<Seat> seatList = seatService.findListByDistrictId(districtId);
 		return seatList.stream()
-				.map(seat -> SeatDto.of(seat))
+				.map(seat -> OutSeatDto.of(seat))
 				.collect(Collectors.toList());
 	}
 	
-	// 1개의 좌석 조회
+	// 1개의 좌석 조회 (좌석 선택)
 	@GetMapping("/seats/{seatId}")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public SeatDto getSeat(@PathVariable("seatId") Long seatId) {
-		Seat seat = seatService.findById(seatId);
-		return SeatDto.of(seat);
+	public OutSeatDto getSeat(@PathVariable("seatId") Long seatId) {
+		Seat seat = seatService.findByIdAndCheckSelected(seatId);
+		return OutSeatDto.of(seat);
 	}
 }
