@@ -1,4 +1,4 @@
-package com.ticketingberry.domain.entity;
+package com.ticketingberry.domain.user;
 
 import java.time.LocalDateTime;
 
@@ -7,8 +7,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import com.ticketingberry.domain.UserRole;
-import com.ticketingberry.dto.UserDto;
+import com.ticketingberry.domain.image.Image;
+import com.ticketingberry.dto.user.InUserDto;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -84,7 +84,7 @@ public class User {		// 회원 테이블
 	private LocalDateTime updatedAt;	// 회원 객체 수정 시간
 	
 	// 엔티티 생성 정적 메서드
-	public static User of(UserDto userDto, PasswordEncoder passwordEncoder) {
+	public static User of(InUserDto userDto, PasswordEncoder passwordEncoder) {
 		return User.builder()
 				.username(userDto.getUsername())
 				.password(passwordEncoder.encode(userDto.getPassword1()))

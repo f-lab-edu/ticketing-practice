@@ -1,4 +1,4 @@
-package com.ticketingberry.domain.entity;
+package com.ticketingberry.domain.board;
 
 import java.time.LocalDateTime;
 

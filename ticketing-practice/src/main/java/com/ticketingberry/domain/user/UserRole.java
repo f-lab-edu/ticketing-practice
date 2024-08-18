@@ -1,4 +1,4 @@
-package com.ticketingberry.domain;
+package com.ticketingberry.domain.user;
 
 import lombok.Getter;
 

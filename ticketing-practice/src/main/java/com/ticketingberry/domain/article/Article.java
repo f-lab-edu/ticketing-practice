@@ -1,10 +1,14 @@
-package com.ticketingberry.domain.entity;
+package com.ticketingberry.domain.article;
 
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.stereotype.Component;
+
+import com.ticketingberry.domain.board.Board;
+import com.ticketingberry.domain.image.Image;
+import com.ticketingberry.domain.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

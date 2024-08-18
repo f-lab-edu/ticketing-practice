@@ -1,13 +1,18 @@
-package com.ticketingberry.domain.entity;
+package com.ticketingberry.domain.concert;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.stereotype.Component;
 
-import com.ticketingberry.dto.ConcertDto;
+import com.ticketingberry.domain.artist.Artist;
+import com.ticketingberry.domain.district.District;
+import com.ticketingberry.domain.image.Image;
+import com.ticketingberry.domain.place.Place;
+import com.ticketingberry.dto.concert.InConcertDto;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -50,7 +55,8 @@ public class Concert {	// 콘서트(공연) 테이블
 	// orphanRemoval = true: 부모 엔티티(Concert)와의 관계가 제거된 자식 엔티티(District)를 자동으로 삭제
 	// ㄴ Concert에서 District가 제거되면 해당 District는 데이터베이스에서도 삭제
 	@OneToMany(mappedBy = "concert", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<District> districts;	// 공연에 속하는 구역 리스트
+	@Builder.Default
+	private List<District> districts = new ArrayList<>();	// 공연에 속하는 구역 리스트
 	
 	@OneToOne(fetch = FetchType.LAZY)
 	private Image image;		// 공연 대표 이미지
@@ -78,21 +84,21 @@ public class Concert {	// 콘서트(공연) 테이블
 	@LastModifiedDate
 	private LocalDateTime updatedAt;	// 공연 객체 수정 시간
 	
-	public static Concert of(ConcertDto concertDto, Place place, Artist artist) {
+	public static Concert of(InConcertDto inConcertDto, Place place, Artist artist) {
 		return Concert.builder()
 				.place(place)
 				.artist(artist)
-				.title(concertDto.getTitle())
-				.content(concertDto.getContent())
-				.openedTicketAt(concertDto.getOpenedTicketAt())
-				.performedAt(concertDto.getPerformedAt())
+				.title(inConcertDto.getTitle())
+				.content(inConcertDto.getContent())
+				.openedTicketAt(inConcertDto.getOpenedTicketAt())
+				.performedAt(inConcertDto.getPerformedAt())
 				.build();
 	}
 	
-	public void update(ConcertDto concertDto) {
-		this.title = concertDto.getTitle();
-		this.content = concertDto.getContent();
-		this.openedTicketAt = concertDto.getOpenedTicketAt();
-		this.performedAt = concertDto.getPerformedAt();
+	public void update(InConcertDto inConcertDto) {
+		this.title = inConcertDto.getTitle();
+		this.content = inConcertDto.getContent();
+		this.openedTicketAt = inConcertDto.getOpenedTicketAt();
+		this.performedAt = inConcertDto.getPerformedAt();
 	}
 }

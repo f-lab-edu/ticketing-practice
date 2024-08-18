@@ -1,8 +1,6 @@
-package com.ticketingberry.domain.repository;
+package com.ticketingberry.domain.board;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.ticketingberry.domain.entity.Board;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
 	

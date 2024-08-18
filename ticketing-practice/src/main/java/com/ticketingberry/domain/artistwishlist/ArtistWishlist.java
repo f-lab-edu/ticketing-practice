@@ -1,10 +1,13 @@
-package com.ticketingberry.domain.entity;
+package com.ticketingberry.domain.artistwishlist;
 
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.stereotype.Component;
+
+import com.ticketingberry.domain.artist.Artist;
+import com.ticketingberry.domain.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,4 +1,4 @@
-package com.ticketingberry.domain.entity;
+package com.ticketingberry.domain.reservation;
 
 import java.time.LocalDateTime;
 
@@ -6,7 +6,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.stereotype.Component;
 
-import com.ticketingberry.dto.ReservationDto;
+import com.ticketingberry.domain.seat.Seat;
+import com.ticketingberry.domain.user.User;
+import com.ticketingberry.dto.reservation.InReservationDto;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,7 +51,7 @@ public class Reservation {	// 예매 테이블
 	@LastModifiedDate
 	private LocalDateTime updatedAt;	// 예매 객체 수정 시간
 	
-	public static Reservation of(ReservationDto reservationDto, Seat seat, User user) {
+	public static Reservation of(InReservationDto reservationDto, Seat seat, User user) {
 		return Reservation.builder()
 				.seat(seat)
 				.user(user)

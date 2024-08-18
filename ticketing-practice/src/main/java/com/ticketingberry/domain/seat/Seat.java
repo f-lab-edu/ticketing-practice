@@ -1,4 +1,4 @@
-package com.ticketingberry.domain.entity;
+package com.ticketingberry.domain.seat;
 
 import java.time.LocalDateTime;
 
@@ -6,7 +6,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.stereotype.Component;
 
-import com.ticketingberry.dto.SeatDto;
+import com.ticketingberry.domain.district.District;
+import com.ticketingberry.dto.seat.SeatDto;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

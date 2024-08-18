@@ -1,13 +1,16 @@
-package com.ticketingberry.domain.entity;
+package com.ticketingberry.domain.district;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.stereotype.Component;
 
-import com.ticketingberry.dto.DistrictDto;
+import com.ticketingberry.domain.concert.Concert;
+import com.ticketingberry.domain.seat.Seat;
+import com.ticketingberry.dto.district.InDistrictDto;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -40,7 +43,8 @@ public class District {		// 구역 테이블
 	private Concert concert;		// 구역이 속한 공연
 	
 	@OneToMany(mappedBy = "district", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Seat> seats;		// 구역에 속한 좌석들
+	@Builder.Default
+	private List<Seat> seats = new ArrayList<>();		// 구역에 속한 좌석들
 	
 	@NotNull
 	@Column(length = 10)
@@ -52,7 +56,7 @@ public class District {		// 구역 테이블
 	@LastModifiedDate
 	private LocalDateTime updatedAt;	// 구역 객체 수정 시간
 	
-	public static District of(DistrictDto districtDto, Concert concert) {
+	public static District of(InDistrictDto districtDto, Concert concert) {
 		return District.builder()
 				.concert(concert)
 				.districtName(districtDto.getDistrictName())
