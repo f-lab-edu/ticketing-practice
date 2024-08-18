@@ -1,6 +1,6 @@
-package com.ticketingberry.dto;
+package com.ticketingberry.dto.place;
 
-import com.ticketingberry.domain.entity.Place;
+import com.ticketingberry.domain.place.Place;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

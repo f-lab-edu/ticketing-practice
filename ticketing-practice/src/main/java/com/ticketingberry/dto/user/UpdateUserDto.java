@@ -1,4 +1,4 @@
-package com.ticketingberry.dto;
+package com.ticketingberry.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
