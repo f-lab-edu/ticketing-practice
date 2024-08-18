@@ -1,5 +1,7 @@
 package com.ticketingberry.service;
 
+import static com.ticketingberry.domain.user.UserRole.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,12 +12,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.ticketingberry.domain.entity.User;
-import com.ticketingberry.domain.repository.UserRepository;
+import com.ticketingberry.domain.user.User;
+import com.ticketingberry.domain.user.UserRepository;
 
 import lombok.RequiredArgsConstructor;
-
-import static com.ticketingberry.domain.UserRole.*;
 
 @Service
 @RequiredArgsConstructor

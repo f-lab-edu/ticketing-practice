@@ -4,11 +4,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.ticketingberry.domain.entity.Concert;
-import com.ticketingberry.domain.entity.District;
-import com.ticketingberry.domain.repository.ConcertRepository;
-import com.ticketingberry.domain.repository.DistrictRepository;
-import com.ticketingberry.dto.DistrictDto;
+import com.ticketingberry.domain.concert.Concert;
+import com.ticketingberry.domain.concert.ConcertRepository;
+import com.ticketingberry.domain.district.District;
+import com.ticketingberry.domain.district.DistrictRepository;
+import com.ticketingberry.dto.district.InDistrictDto;
 import com.ticketingberry.exception.custom.DataNotFoundException;
 
 import jakarta.transaction.Transactional;
@@ -22,8 +22,8 @@ public class DistrictService {
 	
 	// 구역 추가
 	@Transactional
-	public District create(DistrictDto districtDto, Concert concert) {
-		District district = District.of(districtDto, concert);
+	public District create(InDistrictDto inDistrictDto, Concert concert) {
+		District district = District.of(inDistrictDto, concert);
 		return districtRepository.save(district);
 	}
 	
