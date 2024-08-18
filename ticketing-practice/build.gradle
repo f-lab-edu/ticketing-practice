@@ -115,10 +115,10 @@ jacocoTestReport {
     		// 그 외의 매칭되는 클래스도 제외 대상
             files(classDirectories.files.collect {
                 fileTree(dir: it, excludes: [
-                        "**/*Application*",
+                        "com.ticketingberry.TicketingPracticeApplication*",
                         "**/*Config*",
                         "**/*Dto*",
-                        "**/exception/**"
+                        "**/exception/custom/*"
                 ] + QDomains)
             })
         )
@@ -163,10 +163,10 @@ jacocoTestCoverageVerification {
 			// excludes: 커버리지 측정 시 제외할 클래스 지정
 			// 패키지 레벨의 경로로 지정. 경로에는 *와 ? 사용
 			excludes = [
-                "**/*Application*",
+                "com.ticketingberry.TicketingPracticeApplication*",
                 "**/*Config*",
                 "**/*Dto*",
-                "**/exception/**"
+                "**/exception/custom/*"
 			] + QDomains
 		}
 	}
