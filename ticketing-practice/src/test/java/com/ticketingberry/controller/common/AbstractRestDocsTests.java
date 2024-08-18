@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ticketingberry.config.RestDocsConfiguration;
 
 // RestDocs에 대한 설정을 모든 테스트 클래스의 setUp으로 동일하게 작성해 줄 필요는 없으니
@@ -27,6 +28,9 @@ public class AbstractRestDocsTests {
 	
 	@Autowired
 	protected MockMvc mockMvc;	// HTTP 요청을 시뮬레이션하여 로직 테스트
+	
+	@Autowired
+	protected ObjectMapper objectMapper;
 	
 	@BeforeEach
 	public void setUp(
