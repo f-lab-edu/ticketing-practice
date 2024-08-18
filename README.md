@@ -63,6 +63,9 @@ https://chisel-sleet-47c.notion.site/3e9211b2596e4e02bd79cc41c83443aa?v=e87b5508
 - Controller의 Response를 Entity에서 Dto로 변경
 
 ### #9 하나의 DTO를 요청DTO과 응답DTO 용도로 책임 분산, 공연 예매 관련 기능의 Test Code 작성
+- 공연 예매 관련 기능 모두 테스트 커버리지 측정
+- 테스트 커버리지 클래스 1개 제외하고 나머지는 100% 달성
+![image](https://github.com/user-attachments/assets/2630b397-49d2-4c62-b8f0-70892d900c99)
 - 공연 예매 관련 Service 목록: 
 - [X] PlaceService
 - [X] ConcertService
@@ -80,7 +83,3 @@ https://chisel-sleet-47c.notion.site/3e9211b2596e4e02bd79cc41c83443aa?v=e87b5508
 - SeatDto: 구역 정보를 불러올 때에는 OutSeatDto로 책임 분산
 - ReservationDto: ReservationDto 추상 클래스를 상속받는 InReservationDto와 OutReservationDto로 책임 분산
 - UserDto: 회원가입은 InUserDto로 책임 분산
-
-- 공연 예매 관련 기능 모두 테스트 커버리지 측정
-- 테스트 커버리지 클래스 1개 제외하고 나머지는 100% 달성
-![image](https://github.com/user-attachments/assets/2630b397-49d2-4c62-b8f0-70892d900c99)
