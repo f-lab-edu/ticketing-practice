@@ -11,13 +11,12 @@
 - 공연 좌석 예매, 예매 취소, 예매 목록 보기
 
 ## 경험 및 성과
-- SOLID 원칙을 적용하여 코드의 유연성과 재사용성을 극대화하고, 유지보수성을 높여 시스템 확장에 용이하도록 설계
+- SOLID 원칙을 적용해 코드의 유연성, 재사용성, 유지보수성을 높여 시스템 확장이 용이하도록 설계
 - Spring Boot와 JPA를 사용하여 RESTful API를 설계하고 Spring REST Docs로 문서화
 - MockMvc, Mockito, JUnit을 사용하여 Spring MVC 컨트롤러와 서비스 계층의 단위 및 통합 테스트를 자동화하여 API 동작을 검증하고 문서화
 - JaCoCo를 사용하여 테스트 커버리지 80% 이상을 달성하여 코드 품질과 안정성을 보장
 - Spring Validation을 활용해 데이터 유효성 검사 및 예외 처리를 구현하여 API 안정성을 강화
 - 데이터베이스 작업에서 예외 처리와 트랜잭션 관리를 통해 데이터 무결성을 유지하고, Spring Security로 보안을 강화
-- ExceptionHandler로 글로벌 예외 처리를 구현하여 각종 예외 상황에 대해 일관된 응답과 API 가용성을 개선
 - 객체 그래프가 순환 형태라면 Proxy 객체로 인해 발생하는 Entity 직렬화 문제를 DTO로 Response하도록 변경하여 해결. 또한, DTO로 Response하면 Entity의 중요한 필드 노출을 숨길 수 있어 보안을 더욱 강화
 
 ## ERD 
