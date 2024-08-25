@@ -11,8 +11,8 @@ import com.ticketingberry.domain.user.UserRepository;
 import com.ticketingberry.exception.custom.DataDuplicatedException;
 import com.ticketingberry.exception.custom.DataNotFoundException;
 import com.ticketingberry.exception.custom.PasswordsUnequalException;
-import com.ticketingberry.dto.user.UpdateUserDto;
-import com.ticketingberry.dto.user.InUserDto;
+import com.ticketingberry.dto.user.UserCreateRequest;
+import com.ticketingberry.dto.user.UserUpdateRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,19 +24,20 @@ public class UserService {
 	
 	// 회원 생성
 	@Transactional
-	public User create(InUserDto userDto) {
+	public User create(UserCreateRequest userCreateRequest) {
 		// 비밀번호와 비밀번호 확인이 다를 경우 400(BAD_REQUEST) 던지기
-		if (!userDto.getPassword1().equals(userDto.getPassword2())) {
+		if (!userCreateRequest.getPassword1().equals(userCreateRequest.getPassword2())) {
 			throw new PasswordsUnequalException("비밀번호와 비밀번호 확인이 다릅니다.");
 		}
 		
 		// username으로 회원 조회가 된 경우 중복 객체이므로 409(CONFLICT) 던지기
-		userRepository.findByUsername(userDto.getUsername()).ifPresent(duplicatedUser -> {
-			throw new DataDuplicatedException("username: <" + duplicatedUser.getUsername() + ">은 이미 존재하는 회원입니다.");
+		userRepository.findByUsername(userCreateRequest.getUsername()).ifPresent(duplicatedUser -> {
+			throw new DataDuplicatedException(
+					"username: <" + duplicatedUser.getUsername() + ">은 이미 존재하는 회원입니다.");
 		});
 		
 		// Dto에서 Entity로 변환
-		User user = User.of(userDto, passwordEncoder);
+		User user = UserCreateRequest.newUser(userCreateRequest, passwordEncoder);
 		return userRepository.save(user);
 	}
 	
@@ -58,14 +59,15 @@ public class UserService {
 	@Transactional
 	public User findByUsername(String username) {
 		return userRepository.findByUsername(username)
-				.orElseThrow(() -> new DataNotFoundException("username: <" + username + "> 회원을 찾을 수 없습니다."));
+				.orElseThrow(() -> 
+					new DataNotFoundException("username: <" + username + "> 회원을 찾을 수 없습니다."));
 	}
 	
 	// 회원 수정
 	@Transactional
-	public User update(Long userId, UpdateUserDto updateUserDto) {
+	public User update(Long userId, UserUpdateRequest userUpdateRequest) {
 		User user = findById(userId);
-		user.update(updateUserDto.getNickname(), updateUserDto.getEmail(), updateUserDto.getPhone());
+		user.update(userUpdateRequest.getNickname(), userUpdateRequest.getEmail(), userUpdateRequest.getPhone());
 		return userRepository.save(user);
 	}
 	

@@ -6,10 +6,9 @@ import org.springframework.stereotype.Service;
 
 import com.ticketingberry.domain.district.District;
 import com.ticketingberry.domain.district.DistrictRepository;
-import com.ticketingberry.domain.reservation.ReservationRepository;
 import com.ticketingberry.domain.seat.Seat;
 import com.ticketingberry.domain.seat.SeatRepository;
-import com.ticketingberry.dto.seat.SeatDto;
+import com.ticketingberry.domain.ticket.TicketRepository;
 import com.ticketingberry.exception.custom.AlreadySelectedSeatException;
 import com.ticketingberry.exception.custom.DataNotFoundException;
 
@@ -21,14 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class SeatService {
 	private final SeatRepository seatRepository;
 	private final DistrictRepository districtRepository;
-	private final ReservationRepository reservationRepository;
-	
-	// 좌석 추가
-	@Transactional
-	public Seat create(SeatDto inSeatDto, District district) {
-		Seat seat = Seat.of(inSeatDto, district);
-		return seatRepository.save(seat);
-	}
+	private final TicketRepository ticketRepository;
 	
 	// 1개의 구역에 해당하는 좌석 리스트 조회
 	@Transactional
@@ -43,14 +35,14 @@ public class SeatService {
 		Seat seat = seatRepository.findById(seatId)
 				.orElseThrow(() -> new DataNotFoundException("좌석을 찾을 수 없습니다."));
 		
-		// seat으로 reservation 조회가 된 경우 같은 자리에 또 예매하면 중복이므로 409(CONFLICT) 던지기
-		reservationRepository.findBySeat(seat).ifPresent(duplicatedReservation -> {
-			String districtName = duplicatedReservation.getSeat().getDistrict().getDistrictName();
-			int rowNum = duplicatedReservation.getSeat().getRowNum();
-			int seatNum = duplicatedReservation.getSeat().getSeatNum();
+		// seat으로 ticket 조회가 된 경우 같은 자리에 또 예매하면 중복이므로 409(CONFLICT) 던지기
+		ticketRepository.findBySeat(seat).ifPresent(duplicatedTicket -> {
+			String districtName = duplicatedTicket.getSeat().getDistrict().getDistrictName();
+			int rowNum = duplicatedTicket.getSeat().getRowNum();
+			int seatNum = duplicatedTicket.getSeat().getSeatNum();
 			
 			throw new AlreadySelectedSeatException(
-					districtName + "구역 " + rowNum + "열 " + seatNum + "번 : 이미 선택된 좌석입니다.");
+					districtName + "구역 " + rowNum + "열 " + seatNum + ": 이미 선택된 좌석입니다.");
 		});
 		
 		return seat;

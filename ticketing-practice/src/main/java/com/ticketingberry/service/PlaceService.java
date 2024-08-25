@@ -20,7 +20,7 @@ public class PlaceService {
 	// 공연 장소 추가
 	@Transactional
 	public Place create(PlaceDto placeDto) {
-		Place place = Place.of(placeDto);
+		Place place = PlaceDto.newPlace(placeDto);
 		return placeRepository.save(place);
 	}
 	

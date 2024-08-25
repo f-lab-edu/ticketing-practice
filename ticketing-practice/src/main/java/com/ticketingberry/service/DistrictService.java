@@ -8,7 +8,6 @@ import com.ticketingberry.domain.concert.Concert;
 import com.ticketingberry.domain.concert.ConcertRepository;
 import com.ticketingberry.domain.district.District;
 import com.ticketingberry.domain.district.DistrictRepository;
-import com.ticketingberry.dto.district.InDistrictDto;
 import com.ticketingberry.exception.custom.DataNotFoundException;
 
 import jakarta.transaction.Transactional;
@@ -19,13 +18,6 @@ import lombok.RequiredArgsConstructor;
 public class DistrictService {
 	private final DistrictRepository districtRepository;
 	private final ConcertRepository concertRepository;
-	
-	// 구역 추가
-	@Transactional
-	public District create(InDistrictDto inDistrictDto, Concert concert) {
-		District district = District.of(inDistrictDto, concert);
-		return districtRepository.save(district);
-	}
 	
 	// 1개의 콘서트에 해당하는 구역 리스트 조회
 	@Transactional
