@@ -14,77 +14,77 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ticketingberry.domain.reservation.Reservation;
-import com.ticketingberry.dto.reservation.InReservationDto;
-import com.ticketingberry.dto.reservation.OutReservationDto;
-import com.ticketingberry.service.ReservationService;
+import com.ticketingberry.domain.ticket.Ticket;
+import com.ticketingberry.dto.ticket.TicketRequest;
+import com.ticketingberry.dto.ticket.TicketResponse;
+import com.ticketingberry.service.TicketService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class ReservationController {
-	private final ReservationService reservationService;
+public class TicketController {
+	private final TicketService ticketService;
 	
-	// 좌석 예매
-	@PostMapping("/reservations")
+	// 티켓 예매
+	@PostMapping("/tickets")
 	@ResponseStatus(HttpStatus.CREATED)
 	@ResponseBody
-	public OutReservationDto addReservation(@Valid @RequestBody InReservationDto inReservationDto) {
-		Reservation reservation = reservationService.create(inReservationDto);
-		return OutReservationDto.of(reservation);
+	public TicketResponse addTicket(@Valid @RequestBody TicketRequest ticketRequest) {
+		Ticket reservation = ticketService.create(ticketRequest);
+		return TicketResponse.of(reservation);
 	}
 	
-	// 전체 예매 목록 조회
-	@GetMapping("/reservations")
+	// 전체 티켓 목록 조회
+	@GetMapping("/tickets")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public List<OutReservationDto> getAllReservations() {
-		List<Reservation> reservationList = reservationService.findAll();
-		return entityListToDtoList(reservationList);
+	public List<TicketResponse> getAllTickets() {
+		List<Ticket> ticketList = ticketService.findAll();
+		return entityListToDtoList(ticketList);
 	}
 	
-	// 1명의 회원에 해당하는 예매 목록 조회
-	@GetMapping("/users/{userId}/reservations")
+	// 1명의 회원에 해당하는 티켓 목록 조회
+	@GetMapping("/users/{userId}/tickets")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public List<OutReservationDto> getReservationsByUserId(@PathVariable("userId") Long userId) {
-		List<Reservation> reservationList = reservationService.findListByUserId(userId);
-		return entityListToDtoList(reservationList);
+	public List<TicketResponse> getTicketsByUserId(@PathVariable("userId") Long userId) {
+		List<Ticket> ticketList = ticketService.findListByUserId(userId);
+		return entityListToDtoList(ticketList);
 	}
 	
-	// 예매 1개 조회
-	@GetMapping("/reservations/{reservationId}")
+	// 티켓 1개 조회
+	@GetMapping("/tickets/{ticketId}")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public OutReservationDto getReservation(@PathVariable("reservationId") Long reservationId) {
-		Reservation reservation = reservationService.findById(reservationId);
-		return OutReservationDto.of(reservation);
+	public TicketResponse getTicket(@PathVariable("ticketId") Long ticketId) {
+		Ticket ticket = ticketService.findById(ticketId);
+		return TicketResponse.of(ticket);
 	}
 	
-	// 예매 수정 (입금 완료)
-	@PutMapping("/reservations/{reservationId}")
+	// 티켓 수정 (입금 완료)
+	@PutMapping("/tickets/{ticketId}")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public OutReservationDto modifyReservation(@PathVariable("reservationId") Long reservationId,
-											   @Valid @RequestBody InReservationDto inReservationDto) {
-		Reservation reservation = reservationService.update(reservationId, inReservationDto);
-		return OutReservationDto.of(reservation);
+	public TicketResponse modifyTicket(@PathVariable("ticketId") Long ticketId,
+									   @Valid @RequestBody TicketRequest ticketRequest) {
+		Ticket ticket = ticketService.update(ticketId, ticketRequest);
+		return TicketResponse.of(ticket);
 	}
 	
-	// 예매 취소
-	@DeleteMapping("/reservations/{reservationId}")
+	// 티켓 예매 취소
+	@DeleteMapping("/tickets/{ticketId}")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public OutReservationDto removeReservation(@PathVariable("reservationId") Long reservationId) {
-		Reservation reservation = reservationService.delete(reservationId);
-		return OutReservationDto.of(reservation);
+	public TicketResponse removeTicket(@PathVariable("ticketId") Long ticketId) {
+		Ticket ticket = ticketService.delete(ticketId);
+		return TicketResponse.of(ticket);
 	}
 	
-	private List<OutReservationDto> entityListToDtoList(List<Reservation> reservationList) {
-		return reservationList.stream()
-				.map(reservation -> OutReservationDto.of(reservation))
+	private List<TicketResponse> entityListToDtoList(List<Ticket> ticketList) {
+		return ticketList.stream()
+				.map(ticket -> TicketResponse.of(ticket))
 				.collect(Collectors.toList());
 	}
 }
