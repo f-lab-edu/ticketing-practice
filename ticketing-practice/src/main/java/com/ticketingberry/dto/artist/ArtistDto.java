@@ -23,4 +23,10 @@ public class ArtistDto {
 				.name(artist.getName())
 				.build();
 	}
+	
+	public static Artist newArtist(ArtistDto artistDto) {
+		return Artist.builder()
+				.name(artistDto.getName())
+				.build();
+	}
 }
