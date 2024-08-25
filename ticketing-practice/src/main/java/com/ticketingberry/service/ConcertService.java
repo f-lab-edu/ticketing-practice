@@ -10,9 +10,13 @@ import com.ticketingberry.domain.artist.Artist;
 import com.ticketingberry.domain.artist.ArtistRepository;
 import com.ticketingberry.domain.concert.Concert;
 import com.ticketingberry.domain.concert.ConcertRepository;
+import com.ticketingberry.domain.district.District;
 import com.ticketingberry.domain.place.Place;
 import com.ticketingberry.domain.place.PlaceRepository;
-import com.ticketingberry.dto.concert.InConcertDto;
+import com.ticketingberry.domain.seat.Seat;
+import com.ticketingberry.dto.concert.ConcertRequest;
+import com.ticketingberry.dto.district.DistrictRequest;
+import com.ticketingberry.dto.seat.SeatRequest;
 import com.ticketingberry.exception.custom.DataNotFoundException;
 import com.ticketingberry.exception.custom.InvalidDateException;
 
@@ -27,16 +31,31 @@ public class ConcertService {
 	private final ArtistRepository artistRepository;
 	private final Sort sort = Sort.by(Sort.Order.desc("openedTicketAt"));
 	
-	// 공연 추가
+	// 공연 추가 (구역들과 좌석들도 한 번에 같이 추가)
 	@Transactional
-	public Concert create(InConcertDto inConcertDto) {
+	public Concert create(ConcertRequest concertRequest) {
 		// 공연이 시작하는 날짜가 공연 예매가 열리는 날짜보다 빠르면 예외 던지게 하기
-		checkValidDate(inConcertDto.getOpenedTicketAt(), inConcertDto.getPerformedAt());
+		checkValidDate(concertRequest.getOpenedTicketAt(), concertRequest.getPerformedAt());
 		
-		Place place = findPlace(inConcertDto.getPlaceId());
-		Artist artist = findArtist(inConcertDto.getArtistId());
+		Place place = findPlace(concertRequest.getPlaceId());
+		Artist artist = findArtist(concertRequest.getArtistId());
 		
-		Concert concert = Concert.of(inConcertDto, place, artist);
+		// District 리스트의 값을 제외한 Concert를 우선 생성
+		Concert concert = ConcertRequest.newConcert(concertRequest, place, artist);
+		
+		// District와 Seat을 차례대로 저장
+		concertRequest.getDistrictRequests().forEach(districtRequest -> {
+			// Seat 리스트의 값을 제외한 District를 우선 생성
+			District district = DistrictRequest.newDistrict(districtRequest, concert);
+			concert.getDistricts().add(district);	// concert에 district 추가
+			
+			// Seat을 District에 차례대로 저장
+			districtRequest.getSeatRequests().forEach(seatRequest -> {
+				Seat seat = SeatRequest.newSeat(seatRequest, district);
+				district.getSeats().add(seat);	// district에 seat 추가
+			});
+		});
+		
 		return concertRepository.save(concert);
 	}
 	
@@ -69,11 +88,11 @@ public class ConcertService {
 	
 	// 공연 수정
 	@Transactional
-	public Concert update(Long concertId, InConcertDto inConcertDto) {
+	public Concert update(Long concertId, ConcertRequest concertRequest) {
 		// 공연이 시작하는 날짜가 공연 예매가 열리는 날짜보다 빠르면 예외 던지게 하기 
-		checkValidDate(inConcertDto.getOpenedTicketAt(), inConcertDto.getPerformedAt());
+		checkValidDate(concertRequest.getOpenedTicketAt(), concertRequest.getPerformedAt());
 		Concert concert = findById(concertId);
-		concert.update(inConcertDto);
+		concert.update(concertRequest);
 		return concertRepository.save(concert);
 	}
 	
