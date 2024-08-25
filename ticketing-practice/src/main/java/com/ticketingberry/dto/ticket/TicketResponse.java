@@ -1,8 +1,8 @@
-package com.ticketingberry.dto.reservation;
+package com.ticketingberry.dto.ticket;
 
-import com.ticketingberry.domain.reservation.Reservation;
-import com.ticketingberry.dto.seat.OutSeatDto;
-import com.ticketingberry.dto.user.UserDto;
+import com.ticketingberry.domain.ticket.Ticket;
+import com.ticketingberry.dto.seat.SeatResponse;
+import com.ticketingberry.dto.user.UserResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,16 +13,16 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OutReservationDto extends ReservationDto {
-	private OutSeatDto seatDto;
+public class TicketResponse extends TicketDto {
+	private SeatResponse seatResponse;
 	
-	private UserDto userDto;
+	private UserResponse userResponse;
 	
-	public static OutReservationDto of(Reservation reservation) {
-		return OutReservationDto.builder()
-				.seatDto(OutSeatDto.of(reservation.getSeat()))
-				.userDto(UserDto.of(reservation.getUser()))
-				.deposited(reservation.isDeposited())
+	public static TicketResponse of(Ticket ticket) {
+		return TicketResponse.builder()
+				.seatResponse(SeatResponse.of(ticket.getSeat()))
+				.userResponse(UserResponse.of(ticket.getUser()))
+				.deposited(ticket.isDeposited())
 				.build();
 	}
 }

@@ -1,4 +1,4 @@
-package com.ticketingberry.dto.reservation;
+package com.ticketingberry.dto.ticket;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReservationDto {
-	protected boolean deposited;
+public abstract class TicketDto {
+	private boolean deposited;
 }

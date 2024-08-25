@@ -18,9 +18,17 @@ public class PlaceDto {
 	@Size(min = 1, max = 50, message = "공연 장소 이름을 1 ~ 16자 사이로 입력해주세요.")
 	private String name;
 	
+	// DTO 생성 정적 팩토리 메서드
 	public static PlaceDto of(Place place) {
 		return PlaceDto.builder()
 				.name(place.getName())
+				.build();
+	}
+	
+	// Entity 생성 정적 팩토리 메서드
+	public static Place newPlace(PlaceDto placeDto) {
+		return Place.builder()
+				.name(placeDto.getName())
 				.build();
 	}
 }

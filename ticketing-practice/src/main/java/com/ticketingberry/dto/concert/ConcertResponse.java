@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OutConcertDto extends ConcertDto {
+public class ConcertResponse extends ConcertDto {
 	private PlaceDto placeDto;
 	
 	private ArtistDto artistDto;
@@ -26,8 +26,8 @@ public class OutConcertDto extends ConcertDto {
 	@Builder.Default
 	private List<Long> districtIds = new ArrayList<>();
 	
-	public static OutConcertDto of(Concert concert) {
-		return OutConcertDto.builder()
+	public static ConcertResponse of(Concert concert) {
+		return ConcertResponse.builder()
 				.placeDto(PlaceDto.of(concert.getPlace()))
 				.artistDto(ArtistDto.of(concert.getArtist()))
 				.title(concert.getTitle())

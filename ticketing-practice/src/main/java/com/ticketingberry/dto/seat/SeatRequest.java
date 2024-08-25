@@ -1,7 +1,8 @@
 package com.ticketingberry.dto.seat;
 
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import com.ticketingberry.domain.district.District;
+import com.ticketingberry.domain.seat.Seat;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -9,11 +10,12 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
-public class SeatDto {
-	@NotNull(message = "열 번호를 입력해주세요.")
-	private int rowNum;
-	
-	@NotNull(message = "좌석 번호를 입력해주세요.")
-	private int seatNum;
+public class SeatRequest extends SeatDto {
+	public static Seat newSeat(SeatRequest seatRequest, District district) {
+		return Seat.builder()
+				.district(district)
+				.rowNum(seatRequest.getRowNum())
+				.seatNum(seatRequest.getSeatNum())
+				.build();
+	}
 }

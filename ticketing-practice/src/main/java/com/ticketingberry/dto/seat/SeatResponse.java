@@ -1,7 +1,7 @@
 package com.ticketingberry.dto.seat;
 
 import com.ticketingberry.domain.seat.Seat;
-import com.ticketingberry.dto.district.OutDistrictDto;
+import com.ticketingberry.dto.district.DistrictResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,14 +12,14 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OutSeatDto extends SeatDto {
-	private OutDistrictDto districtDto;
+public class SeatResponse extends SeatDto {
+	private DistrictResponse districtDto;
 	
-	public static OutSeatDto of(Seat seat) {
-		return OutSeatDto.builder()
+	public static SeatResponse of(Seat seat) {
+		return SeatResponse.builder()
 				.rowNum(seat.getRowNum())
 				.seatNum(seat.getSeatNum())
-				.districtDto(OutDistrictDto.of(seat.getDistrict()))
+				.districtDto(DistrictResponse.of(seat.getDistrict()))
 				.build();
 	}
 }

@@ -14,5 +14,5 @@ import lombok.experimental.SuperBuilder;
 public abstract class DistrictDto {
 	@NotNull(message = "구역 이름을 입력해주세요.")
 	@Size(min = 1, max = 5, message = "구역 이름을 1 ~ 5자 사이로 입력해주세요.")
-	protected String districtName;
+	private String districtName;
 }
