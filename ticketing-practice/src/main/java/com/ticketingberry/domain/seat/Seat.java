@@ -7,7 +7,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.stereotype.Component;
 
 import com.ticketingberry.domain.district.District;
-import com.ticketingberry.dto.seat.SeatDto;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,12 +47,4 @@ public class Seat {	// 좌석 테이블
 	
 	@LastModifiedDate
 	private LocalDateTime updatedAt;	// 좌석 객체 수정 시간
-	
-	public static Seat of(SeatDto seatDto, District district) {
-		return Seat.builder()
-				.district(district)
-				.rowNum(seatDto.getRowNum())
-				.seatNum(seatDto.getSeatNum())
-				.build();
-	}
 }

@@ -12,7 +12,7 @@ import com.ticketingberry.domain.artist.Artist;
 import com.ticketingberry.domain.district.District;
 import com.ticketingberry.domain.image.Image;
 import com.ticketingberry.domain.place.Place;
-import com.ticketingberry.dto.concert.InConcertDto;
+import com.ticketingberry.dto.concert.ConcertRequest;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -84,18 +84,7 @@ public class Concert {	// 콘서트(공연) 테이블
 	@LastModifiedDate
 	private LocalDateTime updatedAt;	// 공연 객체 수정 시간
 	
-	public static Concert of(InConcertDto inConcertDto, Place place, Artist artist) {
-		return Concert.builder()
-				.place(place)
-				.artist(artist)
-				.title(inConcertDto.getTitle())
-				.content(inConcertDto.getContent())
-				.openedTicketAt(inConcertDto.getOpenedTicketAt())
-				.performedAt(inConcertDto.getPerformedAt())
-				.build();
-	}
-	
-	public void update(InConcertDto inConcertDto) {
+	public void update(ConcertRequest inConcertDto) {
 		this.title = inConcertDto.getTitle();
 		this.content = inConcertDto.getContent();
 		this.openedTicketAt = inConcertDto.getOpenedTicketAt();

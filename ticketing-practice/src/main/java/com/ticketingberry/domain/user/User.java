@@ -4,11 +4,9 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.ticketingberry.domain.image.Image;
-import com.ticketingberry.dto.user.InUserDto;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -82,20 +80,6 @@ public class User {		// 회원 테이블
 	
 	@LastModifiedDate
 	private LocalDateTime updatedAt;	// 회원 객체 수정 시간
-	
-	// 엔티티 생성 정적 메서드
-	public static User of(InUserDto userDto, PasswordEncoder passwordEncoder) {
-		return User.builder()
-				.username(userDto.getUsername())
-				.password(passwordEncoder.encode(userDto.getPassword1()))
-				.nickname(userDto.getNickname())
-				.email(userDto.getEmail())
-				.phone(userDto.getPhone())
-				.birth(userDto.getBirth())
-				.gender(userDto.getGender())
-				.role(userDto.getRole())
-				.build();
-	}
 	
 	// 특정 필드만 수정하는 메서드
 	public void update(String nickname, String email, String phone) {

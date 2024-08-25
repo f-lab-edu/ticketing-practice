@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import com.ticketingberry.domain.concert.Concert;
 import com.ticketingberry.domain.seat.Seat;
-import com.ticketingberry.dto.district.InDistrictDto;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -55,11 +54,4 @@ public class District {		// 구역 테이블
 	
 	@LastModifiedDate
 	private LocalDateTime updatedAt;	// 구역 객체 수정 시간
-	
-	public static District of(InDistrictDto districtDto, Concert concert) {
-		return District.builder()
-				.concert(concert)
-				.districtName(districtDto.getDistrictName())
-				.build();
-	}
 }

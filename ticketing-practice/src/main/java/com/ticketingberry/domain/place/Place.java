@@ -6,8 +6,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.stereotype.Component;
 
-import com.ticketingberry.dto.place.PlaceDto;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -40,12 +38,6 @@ public class Place {	// 장소 테이블
 
 	@LastModifiedDate
 	private LocalDateTime updatedAt;	// 장소 객체 수정 시간
-	
-	public static Place of(PlaceDto placeDto) {
-		return Place.builder()
-				.name(placeDto.getName())
-				.build();
-	}
 	
 	public void update(String name) {
 		this.name = name;
