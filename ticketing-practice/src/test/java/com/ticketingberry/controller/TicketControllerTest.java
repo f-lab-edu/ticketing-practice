@@ -26,23 +26,23 @@ import com.ticketingberry.domain.artist.Artist;
 import com.ticketingberry.domain.concert.Concert;
 import com.ticketingberry.domain.district.District;
 import com.ticketingberry.domain.place.Place;
-import com.ticketingberry.domain.reservation.Reservation;
 import com.ticketingberry.domain.seat.Seat;
+import com.ticketingberry.domain.ticket.Ticket;
 import com.ticketingberry.domain.user.User;
-import com.ticketingberry.dto.reservation.InReservationDto;
-import com.ticketingberry.dto.reservation.OutReservationDto;
+import com.ticketingberry.dto.ticket.TicketRequest;
+import com.ticketingberry.dto.ticket.TicketResponse;
 import com.ticketingberry.exception.ExceptionAdvice;
 import com.ticketingberry.exception.custom.DataNotFoundException;
-import com.ticketingberry.service.ReservationService;
+import com.ticketingberry.service.TicketService;
 
-@WebMvcTest({ReservationController.class, ExceptionAdvice.class})
-public class ReservationControllerTest extends AbstractRestDocsTests {
+@WebMvcTest({TicketController.class, ExceptionAdvice.class})
+public class TicketControllerTest extends AbstractRestDocsTests {
 	@MockBean
-	private ReservationService reservationService;
+	private TicketService ticketService;
 	
-	private List<Reservation> reservations;
+	private List<Ticket> tickets;
 	
-	private InReservationDto inReservationDto;
+	private TicketRequest ticketRequest;
 	
 	private List<User> users;
 	
@@ -122,15 +122,15 @@ public class ReservationControllerTest extends AbstractRestDocsTests {
 					.seatNum(5)
 					.build());
 		
-		reservations = List.of(
-					Reservation.builder()
+		tickets = List.of(
+					Ticket.builder()
 					.id(1L)
 					.seat(seats.get(0))
 					.user(users.get(0))
 					.deposited(false)
 					.createdAt(LocalDateTime.now())
 					.build(),
-					Reservation.builder()
+					Ticket.builder()
 					.id(2L)
 					.seat(seats.get(1))
 					.user(users.get(1))
@@ -138,7 +138,7 @@ public class ReservationControllerTest extends AbstractRestDocsTests {
 					.createdAt(LocalDateTime.now())
 					.build());
 		
-		inReservationDto = InReservationDto.builder()
+		ticketRequest = TicketRequest.builder()
 				.seatId(seats.get(0).getId())
 				.userId(users.get(0).getId())
 				.deposited(false)
@@ -146,161 +146,161 @@ public class ReservationControllerTest extends AbstractRestDocsTests {
 	}
 	
 	@Test
-	@DisplayName("좌석 예매")
-	void addReservation() throws Exception {
-		Reservation reservation = reservations.get(0);
-		when(reservationService.create(any(InReservationDto.class))).thenReturn(reservation);
+	@DisplayName("티켓 예매")
+	void addTicket() throws Exception {
+		Ticket ticket = tickets.get(0);
+		when(ticketService.create(any(TicketRequest.class))).thenReturn(ticket);
 		
-		MvcResult result = mockMvc.perform(post("/reservations")
+		MvcResult result = mockMvc.perform(post("/tickets")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(inReservationDto)))
+				.content(objectMapper.writeValueAsString(ticketRequest)))
 				.andExpect(status().isCreated())
 				.andReturn();
 		
 		String responseBody = result.getResponse().getContentAsString();
 		
-		OutReservationDto outReservationDto = objectMapper.readValue(responseBody, OutReservationDto.class);
+		TicketResponse ticketResponse = objectMapper.readValue(responseBody, TicketResponse.class);
 		
-		assertNotNull(outReservationDto);
-		assertEquals(reservation.getSeat().getSeatNum(), outReservationDto.getSeatDto().getSeatNum());
-		assertEquals(reservation.getUser().getUsername(), outReservationDto.getUserDto().getUsername());
-		assertEquals(reservation.getSeat().getDistrict().getConcert().getTitle(),
-				outReservationDto.getSeatDto().getDistrictDto().getConcertDto().getTitle());
+		assertNotNull(ticketResponse);
+		assertEquals(ticket.getSeat().getSeatNum(), ticketResponse.getSeatResponse().getSeatNum());
+		assertEquals(ticket.getUser().getUsername(), ticketResponse.getUserResponse().getUsername());
+		assertEquals(ticket.getSeat().getDistrict().getConcert().getTitle(),
+				ticketResponse.getSeatResponse().getDistrictDto().getConcertResponse().getTitle());
 	}
 	
 	@Test
-	@DisplayName("전체 예매 목록 조회")
-	void getAllReservations() throws Exception {
-		when(reservationService.findAll()).thenReturn(reservations);
+	@DisplayName("전체 티켓 목록 조회")
+	void getAllTickets() throws Exception {
+		when(ticketService.findAll()).thenReturn(tickets);
 		
-		MvcResult result = mockMvc.perform(get("/reservations")
+		MvcResult result = mockMvc.perform(get("/tickets")
 				.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andReturn();
 		
 		String responseBody = result.getResponse().getContentAsString();
 		
-		List<OutReservationDto> outReservationDtos
-			= objectMapper.readValue(responseBody, new TypeReference<List<OutReservationDto>>() {});
+		List<TicketResponse> ticketResponses
+			= objectMapper.readValue(responseBody, new TypeReference<List<TicketResponse>>() {});
 		
-		assertNotNull(outReservationDtos);
-		assertEquals(reservations.get(1).getSeat().getSeatNum(), 
-				outReservationDtos.get(1).getSeatDto().getSeatNum());
-		assertEquals(reservations.get(1).getUser().getUsername(), 
-				outReservationDtos.get(1).getUserDto().getUsername());
-		assertEquals(reservations.get(1).getSeat().getDistrict().getConcert().getTitle(),
-				outReservationDtos.get(1).getSeatDto().getDistrictDto().getConcertDto().getTitle());
+		assertNotNull(ticketResponses);
+		assertEquals(tickets.get(1).getSeat().getSeatNum(), 
+				ticketResponses.get(1).getSeatResponse().getSeatNum());
+		assertEquals(tickets.get(1).getUser().getUsername(), 
+				ticketResponses.get(1).getUserResponse().getUsername());
+		assertEquals(tickets.get(1).getSeat().getDistrict().getConcert().getTitle(),
+				ticketResponses.get(1).getSeatResponse().getDistrictDto().getConcertResponse().getTitle());
 	}
 	
 	@Test
-	@DisplayName("1명의 회원에 해당하는 예매 목록 조회")
-	void getReservationsByUserId() throws Exception {
-		List<Reservation> reservationList = List.of(reservations.get(0));
-		when(reservationService.findListByUserId(users.get(0).getId())).thenReturn(reservationList);
+	@DisplayName("1명의 회원에 해당하는 티켓 목록 조회")
+	void getTicketsByUserId() throws Exception {
+		List<Ticket> ticketList = List.of(tickets.get(0));
+		when(ticketService.findListByUserId(users.get(0).getId())).thenReturn(ticketList);
 		
-		MvcResult result = mockMvc.perform(get("/users/{userId}/reservations", users.get(0).getId())
+		MvcResult result = mockMvc.perform(get("/users/{userId}/tickets", users.get(0).getId())
 				.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andReturn();
 		
 		String responseBody = result.getResponse().getContentAsString();
 		
-		List<OutReservationDto> outReservationDtos
-			= objectMapper.readValue(responseBody, new TypeReference<List<OutReservationDto>>() {});
+		List<TicketResponse> ticketResponses
+			= objectMapper.readValue(responseBody, new TypeReference<List<TicketResponse>>() {});
 		
-		assertNotNull(outReservationDtos);
-		assertEquals(reservations.get(0).getSeat().getSeatNum(), 
-				outReservationDtos.get(0).getSeatDto().getSeatNum());
-		assertEquals(reservations.get(0).getUser().getUsername(), 
-				outReservationDtos.get(0).getUserDto().getUsername());
-		assertEquals(reservations.get(0).getSeat().getDistrict().getConcert().getTitle(),
-				outReservationDtos.get(0).getSeatDto().getDistrictDto().getConcertDto().getTitle());
+		assertNotNull(ticketResponses);
+		assertEquals(tickets.get(0).getSeat().getSeatNum(), 
+				ticketResponses.get(0).getSeatResponse().getSeatNum());
+		assertEquals(tickets.get(0).getUser().getUsername(), 
+				ticketResponses.get(0).getUserResponse().getUsername());
+		assertEquals(tickets.get(0).getSeat().getDistrict().getConcert().getTitle(),
+				ticketResponses.get(0).getSeatResponse().getDistrictDto().getConcertResponse().getTitle());
 	}
 	
 	@Test
-	@DisplayName("예매 1개 조회")
-	void getReservation() throws Exception {
-		Reservation reservation = reservations.get(0);
-		when(reservationService.findById(reservation.getId())).thenReturn(reservation);
+	@DisplayName("티켓 1개 조회")
+	void getTicket() throws Exception {
+		Ticket ticket = tickets.get(0);
+		when(ticketService.findById(ticket.getId())).thenReturn(ticket);
 		
-		MvcResult result = mockMvc.perform(get("/reservations/{reservationId}", reservation.getId())
+		MvcResult result = mockMvc.perform(get("/tickets/{ticketId}", ticket.getId())
 				.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andReturn();
 		
 		String responseBody = result.getResponse().getContentAsString();
 		
-		OutReservationDto outReservationDto = objectMapper.readValue(responseBody, OutReservationDto.class);
+		TicketResponse ticketResponse = objectMapper.readValue(responseBody, TicketResponse.class);
 		
-		assertNotNull(outReservationDto);
-		assertEquals(reservation.getSeat().getSeatNum(), outReservationDto.getSeatDto().getSeatNum());
-		assertEquals(reservation.getUser().getUsername(), outReservationDto.getUserDto().getUsername());
-		assertEquals(reservation.getSeat().getDistrict().getConcert().getTitle(),
-				outReservationDto.getSeatDto().getDistrictDto().getConcertDto().getTitle());
+		assertNotNull(ticketResponse);
+		assertEquals(ticket.getSeat().getSeatNum(), ticketResponse.getSeatResponse().getSeatNum());
+		assertEquals(ticket.getUser().getUsername(), ticketResponse.getUserResponse().getUsername());
+		assertEquals(ticket.getSeat().getDistrict().getConcert().getTitle(),
+				ticketResponse.getSeatResponse().getDistrictDto().getConcertResponse().getTitle());
 	}
 	
 	@Test
-	@DisplayName("예매 1개 조회: reservationId로 예매 조회가 안 된 경우 404(NOT_FOUND) 응답")
-	void getReservationById_whenReservationIdDoesNotExist_throwsNotFound() throws Exception {
-		when(reservationService.findById(1000L))
+	@DisplayName("티켓 1개 조회: ticketId로 티켓 조회가 안 된 경우 404(NOT_FOUND) 응답")
+	void getTicketById_whenTicketIdDoesNotExist_throwsNotFound() throws Exception {
+		when(ticketService.findById(1000L))
 		.thenThrow(new DataNotFoundException("예매를 찾을 수 없습니다."));
 		
-		mockMvc.perform(get("/reservations/{reservationId}", 1000L))
+		mockMvc.perform(get("/tickets/{ticketId}", 1000L))
 		.andExpect(status().isNotFound())
 		.andExpect(jsonPath("$.message", is("예매를 찾을 수 없습니다.")))
 		.andExpect(jsonPath("$.status", is(404)));
 	}
 	
 	@Test
-	@DisplayName("예매 수정 (입금 완료)")
-	void modifyReservation() throws Exception {
-		Reservation reservation = reservations.get(0);
+	@DisplayName("티켓 수정 (입금 완료)")
+	void modifyTicket() throws Exception {
+		Ticket ticket = tickets.get(0);
 		
-		inReservationDto = InReservationDto.builder()
+		TicketRequest ticketUpdateRequest = TicketRequest.builder()
 				.seatId(seats.get(0).getId())
 				.userId(users.get(0).getId())
 				.deposited(true)
 				.build();
 		
-		reservation.update(true);
+		ticket.update(true);
 		
-		when(reservationService.update(eq(reservation.getId()), any(InReservationDto.class))).thenReturn(reservation);
+		when(ticketService.update(eq(ticket.getId()), any(TicketRequest.class))).thenReturn(ticket);
 		
-		MvcResult result = mockMvc.perform(put("/reservations/{reservationId}", reservation.getId())
+		MvcResult result = mockMvc.perform(put("/tickets/{ticketId}", ticket.getId())
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(inReservationDto)))
+				.content(objectMapper.writeValueAsString(ticketUpdateRequest)))
 				.andExpect(status().isOk())
 				.andReturn();
 		
 		String responseBody = result.getResponse().getContentAsString();
 		
-		OutReservationDto outReservationDto = objectMapper.readValue(responseBody, OutReservationDto.class);
+		TicketResponse ticketResponse = objectMapper.readValue(responseBody, TicketResponse.class);
 		
-		assertNotNull(outReservationDto);
-		assertEquals(reservation.isDeposited(), outReservationDto.isDeposited());
-		assertEquals(reservation.getSeat().getDistrict().getConcert().getTitle(),
-				outReservationDto.getSeatDto().getDistrictDto().getConcertDto().getTitle());
+		assertNotNull(ticketResponse);
+		assertEquals(ticket.isDeposited(), ticketResponse.isDeposited());
+		assertEquals(ticket.getSeat().getDistrict().getConcert().getTitle(),
+				ticketResponse.getSeatResponse().getDistrictDto().getConcertResponse().getTitle());
 	}
 	
 	@Test
-	@DisplayName("예매 취소")
-	void removeReservation() throws Exception {
-		Reservation reservation = reservations.get(0);
-		when(reservationService.delete(reservation.getId())).thenReturn(reservation);
+	@DisplayName("티켓 예매 취소")
+	void removeTicket() throws Exception {
+		Ticket ticket = tickets.get(0);
+		when(ticketService.delete(ticket.getId())).thenReturn(ticket);
 		
-		MvcResult result = mockMvc.perform(delete("/reservations/{reservationId}", reservation.getId())
+		MvcResult result = mockMvc.perform(delete("/tickets/{ticketId}", ticket.getId())
 				.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andReturn();
 		
 		String responseBody = result.getResponse().getContentAsString();
 		
-		OutReservationDto outReservationDto = objectMapper.readValue(responseBody, OutReservationDto.class);
+		TicketResponse ticketResponse = objectMapper.readValue(responseBody, TicketResponse.class);
 		
-		assertNotNull(outReservationDto);
-		assertEquals(reservation.getSeat().getSeatNum(), outReservationDto.getSeatDto().getSeatNum());
-		assertEquals(reservation.getUser().getUsername(), outReservationDto.getUserDto().getUsername());
-		assertEquals(reservation.getSeat().getDistrict().getConcert().getTitle(),
-				outReservationDto.getSeatDto().getDistrictDto().getConcertDto().getTitle());
+		assertNotNull(ticketResponse);
+		assertEquals(ticket.getSeat().getSeatNum(), ticketResponse.getSeatResponse().getSeatNum());
+		assertEquals(ticket.getUser().getUsername(), ticketResponse.getUserResponse().getUsername());
+		assertEquals(ticket.getSeat().getDistrict().getConcert().getTitle(),
+				ticketResponse.getSeatResponse().getDistrictDto().getConcertResponse().getTitle());
 	}
 }
