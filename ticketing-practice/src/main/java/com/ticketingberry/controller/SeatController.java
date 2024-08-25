@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketingberry.domain.seat.Seat;
-import com.ticketingberry.dto.seat.OutSeatDto;
+import com.ticketingberry.dto.seat.SeatResponse;
 import com.ticketingberry.service.SeatService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,10 +25,10 @@ public class SeatController {
 	@GetMapping("/districts/{districtId}/seats")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public List<OutSeatDto> getSeatsByDistrictId(@PathVariable("districtId") Long districtId) {
+	public List<SeatResponse> getSeatsByDistrictId(@PathVariable("districtId") Long districtId) {
 		List<Seat> seatList = seatService.findListByDistrictId(districtId);
 		return seatList.stream()
-				.map(seat -> OutSeatDto.of(seat))
+				.map(seat -> SeatResponse.of(seat))
 				.collect(Collectors.toList());
 	}
 	
@@ -36,8 +36,8 @@ public class SeatController {
 	@GetMapping("/seats/{seatId}")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public OutSeatDto getSeat(@PathVariable("seatId") Long seatId) {
+	public SeatResponse getSeat(@PathVariable("seatId") Long seatId) {
 		Seat seat = seatService.findByIdAndCheckSelected(seatId);
-		return OutSeatDto.of(seat);
+		return SeatResponse.of(seat);
 	}
 }
