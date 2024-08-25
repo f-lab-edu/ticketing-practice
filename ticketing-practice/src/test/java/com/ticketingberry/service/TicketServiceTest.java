@@ -16,19 +16,19 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 
-import com.ticketingberry.domain.reservation.Reservation;
-import com.ticketingberry.domain.reservation.ReservationRepository;
 import com.ticketingberry.domain.seat.Seat;
 import com.ticketingberry.domain.seat.SeatRepository;
+import com.ticketingberry.domain.ticket.Ticket;
+import com.ticketingberry.domain.ticket.TicketRepository;
 import com.ticketingberry.domain.user.User;
 import com.ticketingberry.domain.user.UserRepository;
-import com.ticketingberry.dto.reservation.InReservationDto;
+import com.ticketingberry.dto.ticket.TicketRequest;
 import com.ticketingberry.exception.custom.DataNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
-public class ReservationServiceTest {
+public class TicketServiceTest {
 	@Mock
-	private ReservationRepository reservationRepository;
+	private TicketRepository ticketRepository;
 	
 	@Mock
 	private SeatRepository seatRepository;
@@ -37,11 +37,11 @@ public class ReservationServiceTest {
 	private UserRepository userRepository;
 	
 	@InjectMocks
-	private ReservationService reservationService;
+	private TicketService ticketService;
 	
-	private Reservation reservation;
+	private Ticket ticket;
 	
-	private InReservationDto reservationDto;
+	private TicketRequest ticketRequest;
 	
 	private Seat seat;
 	
@@ -51,7 +51,7 @@ public class ReservationServiceTest {
 	
 	@BeforeEach
 	void setUp() {
-		reservation = Reservation.builder()
+		ticket = Ticket.builder()
 				.id(1L)
 				.seat(seat)
 				.user(user)
@@ -59,7 +59,7 @@ public class ReservationServiceTest {
 				.createdAt(LocalDateTime.now())
 				.build();
 		
-		reservationDto = InReservationDto.builder()
+		ticketRequest = TicketRequest.builder()
 				.seatId(1L)
 				.userId(1L)
 				.deposited(false)
@@ -78,94 +78,94 @@ public class ReservationServiceTest {
 	}
 	
 	@Test
-	@DisplayName("좌석 예매 성공")
-	void createReservation_success() {
+	@DisplayName("티켓 예매 성공")
+	void createTicket_success() {
 		when(seatRepository.findById(seat.getId())).thenReturn(Optional.of(seat));
 		when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-		when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
+		when(ticketRepository.save(any(Ticket.class))).thenReturn(ticket);
 		
-		Reservation result = reservationService.create(reservationDto);
-		assertEquals(reservation, result);
+		Ticket result = ticketService.create(ticketRequest);
+		assertEquals(ticket, result);
 	}
 	
 	@Test
-	@DisplayName("좌석 예매: seatId로 좌석 조회가 안 된 경우 DataNotFoundException")
-	void createReservation_whenUserIdDoesNotExist_throwsDataNotFoundException() {
+	@DisplayName("티켓 예매: seatId로 좌석 조회가 안 된 경우 DataNotFoundException")
+	void createTicket_whenUserIdDoesNotExist_throwsDataNotFoundException() {
 		when(seatRepository.findById(seat.getId())).thenReturn(Optional.empty());
 		DataNotFoundException exception
-			= assertThrows(DataNotFoundException.class, () -> reservationService.create(reservationDto));
+			= assertThrows(DataNotFoundException.class, () -> ticketService.create(ticketRequest));
 		assertEquals("좌석을 찾을 수 없습니다.", exception.getMessage());
 	}
 	
 	@Test
-	@DisplayName("전체 예매 목록 조회 성공")
-	void findAllReservations_success() {
-		List<Reservation> reservations = List.of(reservation, Reservation.builder().build());
-		when(reservationRepository.findAll(sort)).thenReturn(reservations);
-		List<Reservation> result = reservationService.findAll();
-		assertEquals(reservations, result);
+	@DisplayName("전체 티켓 목록 조회 성공")
+	void findAllTickets_success() {
+		List<Ticket> tickets = List.of(ticket, Ticket.builder().build());
+		when(ticketRepository.findAll(sort)).thenReturn(tickets);
+		List<Ticket> result = ticketService.findAll();
+		assertEquals(tickets, result);
 	}
 	
 	@Test
-	@DisplayName("1명의 회원에 해당하는 예매 목록 조회")
-	void findReservationsByUserId_success() {
-		List<Reservation> reservations = List.of(reservation, Reservation.builder().user(user).build());
+	@DisplayName("1명의 회원에 해당하는 티켓 목록 조회")
+	void findTicketsByUserId_success() {
+		List<Ticket> tickets = List.of(ticket, Ticket.builder().user(user).build());
 		when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-		when(reservationRepository.findByUser(user, sort)).thenReturn(reservations);
+		when(ticketRepository.findByUser(user, sort)).thenReturn(tickets);
 		
-		List<Reservation> result = reservationService.findListByUserId(user.getId());
-		assertEquals(reservations, result);
+		List<Ticket> result = ticketService.findListByUserId(user.getId());
+		assertEquals(tickets, result);
 	}
 	
 	@Test
-	@DisplayName("1명의 회원에 해당하는 예매 목록 조회: userId로 좌석 조회가 안 된 경우 DataNotFoundException")
-	void findReservationsByUserId_whenUserIdDoesNotExist_throwsDataNotFoundException() {
+	@DisplayName("1명의 회원에 해당하는 티켓 목록 조회: userId로 좌석 조회가 안 된 경우 DataNotFoundException")
+	void findTicketsByUserId_whenUserIdDoesNotExist_throwsDataNotFoundException() {
 		when(userRepository.findById(2L)).thenReturn(Optional.empty());
 		DataNotFoundException exception
-			= assertThrows(DataNotFoundException.class, () -> reservationService.findListByUserId(2L));
+			= assertThrows(DataNotFoundException.class, () -> ticketService.findListByUserId(2L));
 		assertEquals("회원을 찾을 수 없습니다.", exception.getMessage());
 	}
 	
 	@Test
-	@DisplayName("예매 1개 조회 성공")
-	void findReservationById_success() {
-		when(reservationRepository.findById(reservation.getId())).thenReturn(Optional.of(reservation));
-		Reservation result = reservationService.findById(reservation.getId());
-		assertEquals(reservation, result);
+	@DisplayName("티켓 1개 조회 성공")
+	void findTicketById_success() {
+		when(ticketRepository.findById(ticket.getId())).thenReturn(Optional.of(ticket));
+		Ticket result = ticketService.findById(ticket.getId());
+		assertEquals(ticket, result);
 	}
 	
 	@Test
-	@DisplayName("예매 1개 조회: reservationId로 좌석 조회가 안 된 경우 DataNotFoundException")
-	void findReservationById_whenReservationIdDoesNotExist_throwsDataNotFoundException() {
-		when(reservationRepository.findById(2L)).thenReturn(Optional.empty());
+	@DisplayName("티켓 1개 조회: ticketId로 티켓 조회가 안 된 경우 DataNotFoundException")
+	void findTicketById_whenTicketIdDoesNotExist_throwsDataNotFoundException() {
+		when(ticketRepository.findById(2L)).thenReturn(Optional.empty());
 		DataNotFoundException exception
-			= assertThrows(DataNotFoundException.class, () -> reservationService.findById(2L));
-		assertEquals("예매를 찾을 수 없습니다.", exception.getMessage());
+			= assertThrows(DataNotFoundException.class, () -> ticketService.findById(2L));
+		assertEquals("티켓을 찾을 수 없습니다.", exception.getMessage());
 	}
 	
 	@Test
-	@DisplayName("예매 수정 성공")
-	void updateReservation_success() {
-		when(reservationRepository.findById(reservation.getId())).thenReturn(Optional.of(reservation));
+	@DisplayName("티켓 수정 성공")
+	void updateTicket_success() {
+		when(ticketRepository.findById(ticket.getId())).thenReturn(Optional.of(ticket));
 		
-		reservationDto = InReservationDto.builder()
-				.seatId(1L)
-				.userId(1L)
+		TicketRequest ticketUpdateRequest = TicketRequest.builder()
+				.seatId(seat.getId())
+				.userId(user.getId())
 				.deposited(true)
 				.build();
 		
-		when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
+		when(ticketRepository.save(any(Ticket.class))).thenReturn(ticket);
 		
-		Reservation result = reservationService.update(reservation.getId(), reservationDto);
+		Ticket result = ticketService.update(ticket.getId(), ticketUpdateRequest);
 		assertEquals(true, result.isDeposited());
 	}
 	
 	@Test
-	@DisplayName("예매 취소 성공")
-	void deleteReservation_success() {
-		when(reservationRepository.findById(reservation.getId())).thenReturn(Optional.of(reservation));
-		Reservation result = reservationService.delete(reservation.getId());
-		verify(reservationRepository, times(1)).delete(reservation);
-		assertEquals(reservation, result);
+	@DisplayName("티켓 예매 취소 성공")
+	void deleteTicket_success() {
+		when(ticketRepository.findById(ticket.getId())).thenReturn(Optional.of(ticket));
+		Ticket result = ticketService.delete(ticket.getId());
+		verify(ticketRepository, times(1)).delete(ticket);
+		assertEquals(ticket, result);
 	}
 }
