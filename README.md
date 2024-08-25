@@ -67,19 +67,17 @@ https://chisel-sleet-47c.notion.site/3e9211b2596e4e02bd79cc41c83443aa?v=e87b5508
 ![image](https://github.com/user-attachments/assets/f59550d6-a9c1-483b-90af-8cd07399a13d)
 
 - 공연 예매 관련 Service 목록: 
-- [X] PlaceService
-- [X] ConcertService
-- [X] DistrictService
-- [X] SeatService
-- [X] ReservationService
+- [x] PlaceService
+- [x] ConcertService
+- [x] DistrictService
+- [x] SeatService
+- [x] TicketService
 - 공연 예매 관련 Controller 목록: 
-- [X] PlaceController
-- [X] ConcertController
-- [X] DistrictController
-- [X] SeatController
-- [X] ReservationController
-- ConcertDto: ConcertDto 추상 클래스를 상속받는 InConcertDto와 OutConcertDto로 책임 분산
-- DistrictDto: DistrictDto 추상 클래스를 상속받는 InDistrictDto와 OutDistrictDto로 책임 분산
-- SeatDto: 구역 정보를 불러올 때에는 OutSeatDto로 책임 분산
-- ReservationDto: ReservationDto 추상 클래스를 상속받는 InReservationDto와 OutReservationDto로 책임 분산
-- UserDto: 회원가입은 InUserDto로 책임 분산
+- [x] PlaceController
+- [x] ConcertController
+- [x] DistrictController
+- [x] SeatController
+- [x] TicketController
+- 하나의 XXXDto를 요청(XXXRequest), 응답(XXXResponse)로 책임 분산
+- DTO에 Entity 생성 정적 팩터리 메서드를 선언하고, Entity에는 정적 팩터리 메서드 제거
+- Reservation에서 Ticket으로 domain 이름 변경
