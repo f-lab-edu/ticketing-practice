@@ -25,7 +25,7 @@ import com.ticketingberry.domain.concert.Concert;
 import com.ticketingberry.domain.district.District;
 import com.ticketingberry.domain.place.Place;
 import com.ticketingberry.domain.seat.Seat;
-import com.ticketingberry.dto.district.OutDistrictDto;
+import com.ticketingberry.dto.district.DistrictResponse;
 import com.ticketingberry.exception.ExceptionAdvice;
 import com.ticketingberry.exception.custom.DataNotFoundException;
 import com.ticketingberry.service.DistrictService;
@@ -93,11 +93,11 @@ public class DistrictControllerTest extends AbstractRestDocsTests {
 		
 		String responseBody = result.getResponse().getContentAsString();
 		
-		List<OutDistrictDto> outDistrictDtos
-			= objectMapper.readValue(responseBody, new TypeReference<List<OutDistrictDto>>() {});
+		List<DistrictResponse> districtResponses
+			= objectMapper.readValue(responseBody, new TypeReference<List<DistrictResponse>>() {});
 	
-		assertNotNull(outDistrictDtos);
-		assertEquals(districts.get(1).getDistrictName(), outDistrictDtos.get(1).getDistrictName());
+		assertNotNull(districtResponses);
+		assertEquals(districts.get(1).getDistrictName(), districtResponses.get(1).getDistrictName());
 	}
 	
 	@Test
@@ -112,10 +112,10 @@ public class DistrictControllerTest extends AbstractRestDocsTests {
 		
 		String responseBody = result.getResponse().getContentAsString();
 		
-		OutDistrictDto outDistrictDto = objectMapper.readValue(responseBody, OutDistrictDto.class);
+		DistrictResponse districtResponse = objectMapper.readValue(responseBody, DistrictResponse.class);
 		
-		assertNotNull(outDistrictDto);
-		assertEquals(district.getDistrictName(), outDistrictDto.getDistrictName());
+		assertNotNull(districtResponse);
+		assertEquals(district.getDistrictName(), districtResponse.getDistrictName());
 	}
 	
 	@Test

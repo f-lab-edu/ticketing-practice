@@ -25,9 +25,9 @@ import com.ticketingberry.domain.artist.Artist;
 import com.ticketingberry.domain.concert.Concert;
 import com.ticketingberry.domain.district.District;
 import com.ticketingberry.domain.place.Place;
-import com.ticketingberry.domain.reservation.Reservation;
 import com.ticketingberry.domain.seat.Seat;
-import com.ticketingberry.dto.seat.OutSeatDto;
+import com.ticketingberry.domain.ticket.Ticket;
+import com.ticketingberry.dto.seat.SeatResponse;
 import com.ticketingberry.exception.ExceptionAdvice;
 import com.ticketingberry.exception.custom.AlreadySelectedSeatException;
 import com.ticketingberry.exception.custom.DataNotFoundException;
@@ -102,11 +102,11 @@ public class SeatControllerTest extends AbstractRestDocsTests {
 		
 		String responseBody = result.getResponse().getContentAsString();
 		
-		List<OutSeatDto> outSeatDtos
-			= objectMapper.readValue(responseBody, new TypeReference<List<OutSeatDto>>() {});
+		List<SeatResponse> seatResponses
+			= objectMapper.readValue(responseBody, new TypeReference<List<SeatResponse>>() {});
 		
-		assertNotNull(outSeatDtos);
-		assertEquals(seats.get(1).getSeatNum(), outSeatDtos.get(1).getSeatNum());
+		assertNotNull(seatResponses);
+		assertEquals(seats.get(1).getSeatNum(), seatResponses.get(1).getSeatNum());
 	}
 	
 	@Test
@@ -121,10 +121,10 @@ public class SeatControllerTest extends AbstractRestDocsTests {
 		
 		String responseBody = result.getResponse().getContentAsString();
 		
-		OutSeatDto outSeatDto = objectMapper.readValue(responseBody, OutSeatDto.class);
+		SeatResponse seatResponse = objectMapper.readValue(responseBody, SeatResponse.class);
 		
-		assertNotNull(outSeatDto);
-		assertEquals(seat.getSeatNum(), outSeatDto.getSeatNum());
+		assertNotNull(seatResponse);
+		assertEquals(seat.getSeatNum(), seatResponse.getSeatNum());
 	}
 	
 	@Test
@@ -142,13 +142,13 @@ public class SeatControllerTest extends AbstractRestDocsTests {
 	@Test
 	@DisplayName("이미 선택된 좌석인지 체크: seat으로 좌석 조회가 된 경우 같은 자리에 또 예매하면 중복이므로 409(CONFLICT) 응답")
 	void getAndCheckSelectedSeat_whenReservationFindFromSeat__throwsConflict() throws Exception {		
-		Reservation reservation = Reservation.builder()
+		Ticket ticket = Ticket.builder()
 				.seat(seat)
 				.build();
 		
-		String districtName = reservation.getSeat().getDistrict().getDistrictName();
-		int rowNum = reservation.getSeat().getRowNum();
-		int seatNum = reservation.getSeat().getSeatNum();
+		String districtName = ticket.getSeat().getDistrict().getDistrictName();
+		int rowNum = ticket.getSeat().getRowNum();
+		int seatNum = ticket.getSeat().getSeatNum();
 		
 		when(seatService.findByIdAndCheckSelected(seat.getId()))
 		.thenThrow(new AlreadySelectedSeatException(districtName + "구역 " + rowNum + "열 " + seatNum + "번 : 이미 선택된 좌석입니다."));

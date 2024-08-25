@@ -28,9 +28,9 @@ import com.ticketingberry.exception.ExceptionAdvice;
 import com.ticketingberry.exception.custom.DataDuplicatedException;
 import com.ticketingberry.exception.custom.DataNotFoundException;
 import com.ticketingberry.exception.custom.PasswordsUnequalException;
-import com.ticketingberry.dto.user.UpdateUserDto;
-import com.ticketingberry.dto.user.UserDto;
-import com.ticketingberry.dto.user.InUserDto;
+import com.ticketingberry.dto.user.UserUpdateRequest;
+import com.ticketingberry.dto.user.UserCreateRequest;
+import com.ticketingberry.dto.user.UserResponse;
 import com.ticketingberry.service.UserService;
 
 //앞에서 작성한 API에 대해 테스트 코드를 작성한다.
@@ -46,7 +46,9 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	
 	private User user;
 	
-	private InUserDto userDto;
+	private UserCreateRequest userCreateRequest;
+	
+	private UserUpdateRequest userUpdateRequest;
 	
 	@BeforeEach
 	void setUp() {
@@ -63,7 +65,7 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				.createdAt(LocalDateTime.now())
 				.build();
 		
-		userDto = InUserDto.builder()
+		userCreateRequest = UserCreateRequest.builder()
 				.username("testuser")
 				.password1("testpassword")
 				.password2("testpassword")
@@ -73,36 +75,45 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				.birth("20000101")
 				.gender("F")
 				.build();
+		
+		userUpdateRequest = UserUpdateRequest.builder()
+				.nickname("테스트")
+				.email("testuser@example.com")
+				.phone("01012345678")
+				.username(user.getUsername())
+				.birth(user.getBirth())
+				.gender(user.getGender())
+				.build();
 	}
 	
 	@Test
 	@DisplayName("회원 가입")
 	void addUser() throws Exception {
 		// UserService의 Mock 객체에 대해 create 메서드 호출 시 반환 값 설정
-		when(userService.create(any(InUserDto.class))).thenReturn(user);
+		when(userService.create(any(UserCreateRequest.class))).thenReturn(user);
 		
 		// API 호출 및 테스트
 		MvcResult result = mockMvc.perform(post("/users")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(userDto)))
+				.content(objectMapper.writeValueAsString(userCreateRequest)))
 				.andExpect(status().isCreated())
 				.andReturn();
 		
 		// 응답 본문을 문자열로 가져옴
 		String responseBody = result.getResponse().getContentAsString();
 		
-		// JSON 문자열을 UserDto 객체로 변환
-		UserDto responseUserDto = objectMapper.readValue(responseBody, UserDto.class);
+		// JSON 문자열을 UserResponse 객체로 변환
+		UserResponse userResponse = objectMapper.readValue(responseBody, UserResponse.class);
 		
 		// 가져온 데이터에 대한 검증을 추가
-		assertNotNull(responseUserDto);
-		assertEquals(responseUserDto.getUsername(), userDto.getUsername());
+		assertNotNull(userResponse);
+		assertEquals(userResponse.getUsername(), userCreateRequest.getUsername());
 	}
 	
 	@Test
 	@DisplayName("회원 가입: 비밀번호와 비밀번호 확인이 다르면 400(BAD_REQUEST) 응답")
 	void addUser_whenPasswordsDoNotMatch_throwsBadRequest() throws Exception {
-		userDto = InUserDto.builder()
+		userCreateRequest = UserCreateRequest.builder()
 				.username("testuser")
 				.password1("password")
 				.password2("differentPassword")
@@ -114,12 +125,12 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				.build();
 		
 		Mockito.doThrow(new PasswordsUnequalException("비밀번호와 비밀번호 확인이 다릅니다."))
-		.when(userService).create(any(InUserDto.class));
+		.when(userService).create(any(UserCreateRequest.class));
 		
 		// API 호출 및 테스트
 		mockMvc.perform(post("/users")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(userDto)))
+				.content(objectMapper.writeValueAsString(userCreateRequest)))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.message", is("비밀번호와 비밀번호 확인이 다릅니다.")))
 				.andExpect(jsonPath("$.status", is(400)));
@@ -128,15 +139,16 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	@Test
 	@DisplayName("회원 가입: username으로 회원 조회가 된 경우 중복 객체이므로 409(CONFLICT) 응답")
 	void addUser_whenUsernameAlreadyExists_throwsConflict() throws Exception {		
-		Mockito.doThrow(new DataDuplicatedException("username: <" + userDto.getUsername() + ">은 이미 존재하는 회원입니다."))
-		.when(userService).create(any(InUserDto.class));
+		Mockito.doThrow(new DataDuplicatedException(
+				"username: <" + userCreateRequest.getUsername() + ">은 이미 존재하는 회원입니다."))
+				.when(userService).create(any(UserCreateRequest.class));
 		
 		// API 호출 및 테스트
 		mockMvc.perform(post("/users")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(userDto)))
+				.content(objectMapper.writeValueAsString(userCreateRequest)))
 				.andExpect(status().isConflict())
-				.andExpect(jsonPath("$.message", is("username: <" + userDto.getUsername() + ">은 이미 존재하는 회원입니다.")))
+				.andExpect(jsonPath("$.message", is("username: <" + userCreateRequest.getUsername() + ">은 이미 존재하는 회원입니다.")))
 				.andExpect(jsonPath("$.status", is(409)));
 				
 	}
@@ -163,12 +175,12 @@ public class UserControllerTest extends AbstractRestDocsTests {
 		String responseBody = result.getResponse().getContentAsString();
 		
 		// JSON 문자열을 리스트로 변환
-		List<UserDto> responseUserDtos
-			= objectMapper.readValue(responseBody, new TypeReference<List<UserDto>>() {});
+		List<UserResponse> UserResponses
+			= objectMapper.readValue(responseBody, new TypeReference<List<UserResponse>>() {});
 		
 		// 가져온 데이터에 대한 검증을 추가
-		assertFalse(responseUserDtos.isEmpty());	// 사용자 리스트가 비어있지 않은지 확인
-		assertEquals(responseUserDtos.get(0).getUsername(), userDto.getUsername());	// 첫 번째 사용자의 username 검증
+		assertFalse(UserResponses.isEmpty());	// 사용자 리스트가 비어있지 않은지 확인
+		assertEquals(UserResponses.get(0).getUsername(), user.getUsername());	// 첫 번째 사용자의 username 검증
 		
 		// 문서화는 상위 클래스에서 자동으로 처리됨
 	}
@@ -176,37 +188,34 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	@Test
 	@DisplayName("회원 1명 조회")
 	void getUser() throws Exception {
-		Long userId = 1L;
-		
 		// UserService의 Mock 객체에 대해 findById 메서드 호출 시 반환 값 설정
-		when(userService.findById(userId)).thenReturn(user);
+		when(userService.findById(user.getId())).thenReturn(user);
 		
-		MvcResult result = mockMvc.perform(get("/users/{userId}", userId))
+		MvcResult result = mockMvc.perform(get("/users/{userId}", user.getId())
+				.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andReturn();
 		
 		// 응답 본문을 문자열로 가져옴
 		String responseBody = result.getResponse().getContentAsString();
 		
-		// JSON 문자열을 User 객체로 변환
-		UserDto responseUserDto = objectMapper.readValue(responseBody, UserDto.class);
+		// JSON 문자열을 UserCreate 객체로 변환
+		UserResponse userResponse = objectMapper.readValue(responseBody, UserResponse.class);
 		
 		// 가져온 데이터에 대한 검증을 추가
-		assertNotNull(responseUserDto);	// 사용자가 null이 아닌지 확인
-		assertEquals(responseUserDto.getUsername(), userDto.getUsername());	// 예시: 사용자의 username 검증
+		assertNotNull(userResponse);	// 사용자가 null이 아닌지 확인
+		assertEquals(userResponse.getUsername(), user.getUsername());	// 예시: 사용자의 username 검증
 		
 		// 문서화는 상위 클래스에서 자동으로 처리됨
 	}
 	
 	@Test
 	@DisplayName("회원 1명 조회: userId로 회원 조회가 안 된 경우 404(NOT_FOUND) 응답")
-	void getUser_whenUserIdDoesNotExist_throwsNotFound() throws Exception {
-		Long userId = 1L;
-		
-		when(userService.findById(userId))
+	void getUser_whenUserIdDoesNotExist_throwsNotFound() throws Exception {		
+		when(userService.findById(1000L))
 		.thenThrow(new DataNotFoundException("회원을 찾을 수 없습니다."));
 		
-		mockMvc.perform(get("/users/{userId}", userId))
+		mockMvc.perform(get("/users/{userId}", 1000L))
 				.andExpect(status().isNotFound())
 				.andExpect(jsonPath("$.message", is("회원을 찾을 수 없습니다.")))
 				.andExpect(jsonPath("$.status", is(404)));
@@ -214,51 +223,42 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	
 	@Test
 	@DisplayName("회원 정보 수정")
-	void modifyUser() throws Exception {
-		Long userId = 1L;
+	void modifyUser() throws Exception {	
+		user.update(userUpdateRequest.getNickname(), userUpdateRequest.getEmail(), userUpdateRequest.getPhone());
 		
-		UpdateUserDto updateUserDto = UpdateUserDto.builder()
-				.nickname("닉네임변경")
-				.email("changeEmail@example.com")
-				.phone("01012345678")
-				.build();
+		when(userService.update(eq(user.getId()), any(UserUpdateRequest.class))).thenReturn(user);
 		
-		user.update(updateUserDto.getNickname(), updateUserDto.getEmail(), updateUserDto.getPhone());
-		
-		when(userService.update(eq(userId), any(UpdateUserDto.class))).thenReturn(user);
-		
-		MvcResult result = mockMvc.perform(put("/users/{userId}", userId)
+		MvcResult result = mockMvc.perform(put("/users/{userId}", user.getId())
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(updateUserDto)))
+				.content(objectMapper.writeValueAsString(userUpdateRequest)))
 				.andExpect(status().isOk())
 				.andReturn();
 		
 		String responseBody = result.getResponse().getContentAsString();
 		
-		UserDto responseUserDto = objectMapper.readValue(responseBody, UserDto.class);
+		UserResponse userResponse = objectMapper.readValue(responseBody, UserResponse.class);
 		
-		assertNotNull(responseUserDto);
-		assertEquals(responseUserDto.getNickname(), user.getNickname());
-		assertEquals(responseUserDto.getEmail(), user.getEmail());
-		assertEquals(responseUserDto.getPhone(), user.getPhone());
+		assertNotNull(userResponse);
+		assertEquals(userResponse.getNickname(), userUpdateRequest.getNickname());
+		assertEquals(userResponse.getEmail(), userUpdateRequest.getEmail());
+		assertEquals(userResponse.getPhone(), userUpdateRequest.getPhone());
 	}
 	
 	@Test
 	@DisplayName("회원 탈퇴")
-	void removeUser() throws Exception {
-		Long userId = 1L;
+	void removeUser() throws Exception {		
+		when(userService.delete(user.getId())).thenReturn(user);
 		
-		when(userService.delete(userId)).thenReturn(user);
-		
-		MvcResult result = mockMvc.perform(delete("/users/{userId}", userId))
+		MvcResult result = mockMvc.perform(delete("/users/{userId}", user.getId())
+				.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andReturn();
 		
 		String responseBody = result.getResponse().getContentAsString();
 		
-		UserDto responseUserDto = objectMapper.readValue(responseBody, UserDto.class);
+		UserResponse userResponse = objectMapper.readValue(responseBody, UserResponse.class);
 		
-		assertNotNull(responseUserDto);
-		assertEquals(responseUserDto.getUsername(), userDto.getUsername());
+		assertNotNull(userResponse);
+		assertEquals(userResponse.getUsername(), user.getUsername());
 	}
 }

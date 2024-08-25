@@ -10,7 +10,6 @@ import static java.time.Month.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,11 +25,10 @@ import com.ticketingberry.domain.artist.Artist;
 import com.ticketingberry.domain.concert.Concert;
 import com.ticketingberry.domain.district.District;
 import com.ticketingberry.domain.place.Place;
-import com.ticketingberry.domain.seat.Seat;
-import com.ticketingberry.dto.concert.InConcertDto;
-import com.ticketingberry.dto.concert.OutConcertDto;
-import com.ticketingberry.dto.district.InDistrictDto;
-import com.ticketingberry.dto.seat.SeatDto;
+import com.ticketingberry.dto.concert.ConcertRequest;
+import com.ticketingberry.dto.concert.ConcertResponse;
+import com.ticketingberry.dto.district.DistrictRequest;
+import com.ticketingberry.dto.seat.SeatRequest;
 import com.ticketingberry.exception.ExceptionAdvice;
 import com.ticketingberry.exception.custom.DataNotFoundException;
 import com.ticketingberry.exception.custom.InvalidDateException;
@@ -51,9 +49,7 @@ public class ConcertControllerTest extends AbstractRestDocsTests {
 	
 	private Concert concert;
 	
-	private InConcertDto inConcertDto;
-	
-	private Concert concertNoDistricts;
+	private ConcertRequest concertRequest;
 	
 	private Place place;
 	
@@ -71,16 +67,6 @@ public class ConcertControllerTest extends AbstractRestDocsTests {
 				.name("아이유")
 				.build();
 		
-		concertNoDistricts = Concert.builder()
-				.id(1L)
-				.place(place)
-				.artist(artist)
-				.title("2024 IU HEREH WORLD TOUR CONCERT ENCORE: THE WINNING")
-				.content("공연 날짜: 2024.09.21(토) ~ 2024.09.22(일)")
-				.openedTicketAt(LocalDateTime.of(2024, AUGUST, 12, 20, 00))
-				.performedAt(LocalDateTime.of(2024, SEPTEMBER, 21, 19, 00))
-				.build();
-		
 		concert = Concert.builder()
 				.id(1L)
 				.place(place)
@@ -93,98 +79,77 @@ public class ConcertControllerTest extends AbstractRestDocsTests {
 				.performedAt(LocalDateTime.of(2024, SEPTEMBER, 21, 19, 00))
 				.build();
 		
-		List<SeatDto> inSeatDtos = List.of(
-				SeatDto.builder()
+		List<SeatRequest> SeatRequests = List.of(
+				SeatRequest.builder()
 				.rowNum(1)
 				.seatNum(1)
 				.build(),
-				SeatDto.builder()
+				SeatRequest.builder()
 				.rowNum(1)
 				.seatNum(2)
 				.build());
 		
-		List<InDistrictDto> inDistrictDtos = List.of(
-				InDistrictDto.builder()
+		List<DistrictRequest> DistrictRequests = List.of(
+				DistrictRequest.builder()
 				.districtName("A")
-				.seatDtos(inSeatDtos)
+				.seatRequests(SeatRequests)
 				.build(),
-				InDistrictDto.builder()
+				DistrictRequest.builder()
 				.districtName("B")
-				.seatDtos(inSeatDtos)
+				.seatRequests(SeatRequests)
 				.build());
 		
-		inConcertDto = InConcertDto.builder()
+		concertRequest = ConcertRequest.builder()
 			    .placeId(place.getId())
 			    .artistId(artist.getId())
 			    .title("2024 IU HEREH WORLD TOUR CONCERT ENCORE: THE WINNING")
 			    .content("공연 날짜: 2024.09.21(토) ~ 2024.09.22(일)")
 			    .openedTicketAt(LocalDateTime.of(2024, AUGUST, 12, 20, 0))
 			    .performedAt(LocalDateTime.of(2024, SEPTEMBER, 21, 19, 0))
-			    .districtDtos(inDistrictDtos)
+			    .districtRequests(DistrictRequests)
 			    .build();
 	}
 	
 	@Test
 	@DisplayName("공연 추가 (구역들과 좌석들도 한 번에 같이 추가)")
 	void addConcert() throws Exception {
-		when(concertService.create(any(InConcertDto.class))).thenReturn(concertNoDistricts);
-		
-		AtomicInteger counter = new AtomicInteger(1);
-		
-		inConcertDto.getDistrictDtos().forEach(districtDto -> {
-			when(districtService.create(any(InDistrictDto.class), any(Concert.class)))
-			.thenAnswer(invocation -> {
-		        int i = counter.getAndIncrement();
-		        District district = District.builder()
-		            .id(i)
-		            .concert(concertNoDistricts)
-		            .districtName(districtDto.getDistrictName())
-		            .build();
-		        return district;
-		    });
-		
-	        districtDto.getSeatDtos().forEach(seatDto -> {
-	        	District district = District.builder().id(counter.get()).build();
-	        	Seat seat = Seat.of(seatDto, district);
-	            when(seatService.create(any(SeatDto.class), any(District.class))).thenReturn(seat);
-	        });
-		});
+		when(concertService.create(any(ConcertRequest.class))).thenReturn(concert);
 		
 		MvcResult result = mockMvc.perform(post("/concerts")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(inConcertDto)))
+				.content(objectMapper.writeValueAsString(concertRequest)))
 				.andExpect(status().isCreated())
 				.andReturn();
 		
 		String responseBody = result.getResponse().getContentAsString();
 		
-		OutConcertDto outConcertDto = objectMapper.readValue(responseBody, OutConcertDto.class);
+		ConcertResponse concertResponse = objectMapper.readValue(responseBody, ConcertResponse.class);
 		
-		assertNotNull(outConcertDto);
-		assertEquals(concertNoDistricts.getDistricts().get(0).getId(), 
-				outConcertDto.getDistrictIds().get(0));
+		assertNotNull(concertResponse);
+		assertEquals(concert.getDistricts().get(0).getId(), 
+				concertResponse.getDistrictIds().get(0));
 	}
 	
 	// 공연이 시작하는 날짜가 공연 예매가 열리는 날짜보다 빠르면 예외 던지게 하기
 	@Test
 	@DisplayName("공연이 시작하는 날짜가 공연 예매가 열리는 날짜보다 빠르면 400(BAD REQUEST) 응답")
 	void addConcert_whenPerformedAtIsBeforeThanOpenedTicketDate_throwsBadRequest() throws Exception {
-		InConcertDto invalidDateInConcertDto = InConcertDto.builder()
+		ConcertRequest invalidDateConcertRequest = ConcertRequest.builder()
 			    .placeId(place.getId())
 			    .artistId(artist.getId())
-			    .title(inConcertDto.getTitle())
-			    .content(inConcertDto.getTitle())
+			    .title(concertRequest.getTitle())
+			    .content(concertRequest.getTitle())
 			    .openedTicketAt(LocalDateTime.of(2025, AUGUST, 12, 20, 0))
 			    .performedAt(LocalDateTime.of(2024, SEPTEMBER, 21, 19, 0))
-			    .districtDtos(inConcertDto.getDistrictDtos())
+			    .districtRequests(concertRequest.getDistrictRequests())
 			    .build();
 		
-		when(concertService.create(any(InConcertDto.class)))
+		when(concertService.create(any(ConcertRequest.class)))
 		.thenThrow(new InvalidDateException("공연이 시작하는 날짜가 공연 예매가 열리는 날짜보다 빠릅니다."));
 	
 		mockMvc.perform(post("/concerts")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(invalidDateInConcertDto)))
+				.content(objectMapper.writeValueAsString(invalidDateConcertRequest)))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.message", is("공연이 시작하는 날짜가 공연 예매가 열리는 날짜보다 빠릅니다.")))
 				.andExpect(jsonPath("$.status", is(400)));
@@ -223,12 +188,12 @@ public class ConcertControllerTest extends AbstractRestDocsTests {
 		
 		String responseBody = result.getResponse().getContentAsString();
 		
-		List<OutConcertDto> outConcertDtos
-			= objectMapper.readValue(responseBody, new TypeReference<List<OutConcertDto>>() {});
+		List<ConcertResponse> concrtResponses
+			= objectMapper.readValue(responseBody, new TypeReference<List<ConcertResponse>>() {});
 		
-		assertNotNull(outConcertDtos);
+		assertNotNull(concrtResponses);
 		assertEquals(concerts.get(1).getPlace().getName(),
-				outConcertDtos.get(1).getPlaceDto().getName());
+				concrtResponses.get(1).getPlaceDto().getName());
 	}
 	
 	
@@ -244,10 +209,10 @@ public class ConcertControllerTest extends AbstractRestDocsTests {
 		
 		String responseBody = result.getResponse().getContentAsString();
 		
-		OutConcertDto outConcertDto = objectMapper.readValue(responseBody, OutConcertDto.class);
+		ConcertResponse concrtResponse = objectMapper.readValue(responseBody, ConcertResponse.class);
 		
-		assertNotNull(outConcertDto);
-		assertEquals(concert.getPlace().getName(), outConcertDto.getPlaceDto().getName());
+		assertNotNull(concrtResponse);
+		assertEquals(concert.getPlace().getName(), concrtResponse.getPlaceDto().getName());
 	}
 	
 	@Test
@@ -292,12 +257,12 @@ public class ConcertControllerTest extends AbstractRestDocsTests {
 		
 		String responseBody = result.getResponse().getContentAsString();
 		
-		List<OutConcertDto> outConcertDtos
-			= objectMapper.readValue(responseBody, new TypeReference<List<OutConcertDto>>() {});
+		List<ConcertResponse> concrtResponses
+			= objectMapper.readValue(responseBody, new TypeReference<List<ConcertResponse>>() {});
 		
-		assertNotNull(outConcertDtos);
+		assertNotNull(concrtResponses);
 		assertEquals(concerts.get(1).getArtist().getName(),
-				outConcertDtos.get(1).getArtistDto().getName());
+				concrtResponses.get(1).getArtistDto().getName());
 	}
 	
 	@Test
@@ -342,12 +307,12 @@ public class ConcertControllerTest extends AbstractRestDocsTests {
 		
 		String responseBody = result.getResponse().getContentAsString();
 		
-		List<OutConcertDto> outConcertDtos
-			= objectMapper.readValue(responseBody, new TypeReference<List<OutConcertDto>>() {});
+		List<ConcertResponse> concrtResponses
+			= objectMapper.readValue(responseBody, new TypeReference<List<ConcertResponse>>() {});
 		
-		assertNotNull(outConcertDtos);
+		assertNotNull(concrtResponses);
 		assertEquals(concerts.get(1).getPlace().getName(),
-				outConcertDtos.get(1).getPlaceDto().getName());
+				concrtResponses.get(1).getPlaceDto().getName());
 	}
 	
 	@Test
@@ -366,32 +331,32 @@ public class ConcertControllerTest extends AbstractRestDocsTests {
 	@Test
 	@DisplayName("공연 수정")
 	void modifyConcert() throws Exception {
-		InConcertDto updateInConcertDto = InConcertDto.builder()
+		ConcertRequest concertUpdateRequest = ConcertRequest.builder()
 			    .placeId(place.getId())
 			    .artistId(artist.getId())
-			    .title(inConcertDto.getTitle())
+			    .title(concertRequest.getTitle())
 			    .content("공연 한 달 연기\n공연 날짜: 2024.10.19(토) ~ 2024.10.20(일)")
 			    .openedTicketAt(LocalDateTime.of(2024, AUGUST, 12, 20, 0))
 			    .performedAt(LocalDateTime.of(2024, OCTOBER, 19, 19, 0))
-			    .districtDtos(inConcertDto.getDistrictDtos())
+			    .districtRequests(concertRequest.getDistrictRequests())
 			    .build();
 		
-		concert.update(updateInConcertDto);
+		concert.update(concertUpdateRequest);
 		
-		when(concertService.update(eq(concert.getId()), any(InConcertDto.class))).thenReturn(concert);
+		when(concertService.update(eq(concert.getId()), any(ConcertRequest.class))).thenReturn(concert);
 		
 		MvcResult result = mockMvc.perform(put("/concerts/{concertId}", concert.getId())
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(updateInConcertDto)))
+				.content(objectMapper.writeValueAsString(concertUpdateRequest)))
 				.andExpect(status().isOk())
 				.andReturn();
 		
 		String responseBody = result.getResponse().getContentAsString();
 		
-		OutConcertDto outConcertDto = objectMapper.readValue(responseBody, OutConcertDto.class);
+		ConcertResponse concertResponse = objectMapper.readValue(responseBody, ConcertResponse.class);
 		
-		assertNotNull(outConcertDto);
-		assertEquals(concert.getPerformedAt(), outConcertDto.getPerformedAt());
+		assertNotNull(concertResponse);
+		assertEquals(concertResponse.getPerformedAt(), concertUpdateRequest.getPerformedAt());
 	}
 	
 	@Test
@@ -406,9 +371,9 @@ public class ConcertControllerTest extends AbstractRestDocsTests {
 		
 		String responseBody = result.getResponse().getContentAsString();
 		
-		OutConcertDto outConcertDto = objectMapper.readValue(responseBody, OutConcertDto.class);
+		ConcertResponse concertResponse = objectMapper.readValue(responseBody, ConcertResponse.class);
 		
-		assertNotNull(outConcertDto);
-		assertEquals(concert.getPlace().getName(), outConcertDto.getPlaceDto().getName());
+		assertNotNull(concertResponse);
+		assertEquals(concert.getPlace().getName(), concertResponse.getPlaceDto().getName());
 	}
 }
