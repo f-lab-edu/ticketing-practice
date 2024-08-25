@@ -16,11 +16,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.ticketingberry.domain.district.District;
 import com.ticketingberry.domain.district.DistrictRepository;
-import com.ticketingberry.domain.reservation.Reservation;
-import com.ticketingberry.domain.reservation.ReservationRepository;
 import com.ticketingberry.domain.seat.Seat;
 import com.ticketingberry.domain.seat.SeatRepository;
-import com.ticketingberry.dto.seat.SeatDto;
+import com.ticketingberry.domain.ticket.Ticket;
+import com.ticketingberry.domain.ticket.TicketRepository;
 import com.ticketingberry.exception.custom.AlreadySelectedSeatException;
 import com.ticketingberry.exception.custom.DataNotFoundException;
 
@@ -33,14 +32,12 @@ public class SeatServiceTest {
 	private DistrictRepository districtRepository;
 	
 	@Mock
-	private ReservationRepository reservationRepository;
+	private TicketRepository ticketRepository;
 	
 	@InjectMocks
 	private SeatService seatService;
 	
 	private Seat seat;
-	
-	private SeatDto inSeatDto;
 	
 	private District district;
 	
@@ -57,17 +54,6 @@ public class SeatServiceTest {
 				.rowNum(1)
 				.seatNum(1)
 				.build();
-		
-		inSeatDto = SeatDto.builder()
-				.build();
-	}
-	
-	@Test
-	@DisplayName("좌석 생성 성공")
-	void createSeat_success() {
-		when(seatRepository.save(any(Seat.class))).thenReturn(seat);
-		Seat result = seatService.create(inSeatDto, district);
-		assertEquals(seat, result);
 	}
 	
 	@Test
@@ -94,7 +80,7 @@ public class SeatServiceTest {
 	@DisplayName("좌석 1개 조회(좌석 선택), 이미 선택된 좌석인지 체크 성공")
 	void findSeatByIdAndCheckNotSelected_success() {
 		when(seatRepository.findById(seat.getId())).thenReturn(Optional.of(seat));
-		when(reservationRepository.findBySeat(seat)).thenReturn(Optional.empty());
+		when(ticketRepository.findBySeat(seat)).thenReturn(Optional.empty());
 		Seat result = seatService.findByIdAndCheckSelected(seat.getId());
 		assertEquals(seat, result);
 	}
@@ -110,22 +96,22 @@ public class SeatServiceTest {
 	
 	@Test
 	@DisplayName("이미 선택된 좌석인지 체크: seat으로 좌석 조회가 된 경우 같은 자리에 또 예매하면 중복이므로 AlreadySelectedSeatException")
-	void findSeatByIdAndCheckSelected_whenReservationFindFromSeat__throwsDataNotFoundException() {
+	void findSeatByIdAndCheckSelected_whenticketFindFromSeat__throwsDataNotFoundException() {
 		when(seatRepository.findById(seat.getId())).thenReturn(Optional.of(seat));
 		
-		Reservation reservation = Reservation.builder()
+		Ticket ticket = Ticket.builder()
 				.seat(seat)
 				.build();
 		
-		when(reservationRepository.findBySeat(seat)).thenReturn(Optional.of(reservation));
+		when(ticketRepository.findBySeat(seat)).thenReturn(Optional.of(ticket));
 		
 		AlreadySelectedSeatException exception
 			= assertThrows(AlreadySelectedSeatException.class, () -> seatService.findByIdAndCheckSelected(seat.getId()));
 		
-		String districtName = reservation.getSeat().getDistrict().getDistrictName();
-		int rowNum = reservation.getSeat().getRowNum();
-		int seatNum = reservation.getSeat().getSeatNum();
+		String districtName = ticket.getSeat().getDistrict().getDistrictName();
+		int rowNum = ticket.getSeat().getRowNum();
+		int seatNum = ticket.getSeat().getSeatNum();
 		
-		assertEquals(districtName + "구역 " + rowNum + "열 " + seatNum + "번 : 이미 선택된 좌석입니다.", exception.getMessage());
+		assertEquals(districtName + "구역 " + rowNum + "열 " + seatNum + ": 이미 선택된 좌석입니다.", exception.getMessage());
 	}
 }

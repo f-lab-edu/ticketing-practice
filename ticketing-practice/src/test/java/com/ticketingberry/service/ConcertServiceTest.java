@@ -21,9 +21,12 @@ import com.ticketingberry.domain.artist.Artist;
 import com.ticketingberry.domain.artist.ArtistRepository;
 import com.ticketingberry.domain.concert.Concert;
 import com.ticketingberry.domain.concert.ConcertRepository;
+import com.ticketingberry.domain.district.District;
 import com.ticketingberry.domain.place.Place;
 import com.ticketingberry.domain.place.PlaceRepository;
-import com.ticketingberry.dto.concert.InConcertDto;
+import com.ticketingberry.dto.concert.ConcertRequest;
+import com.ticketingberry.dto.district.DistrictRequest;
+import com.ticketingberry.dto.seat.SeatRequest;
 import com.ticketingberry.exception.custom.DataNotFoundException;
 import com.ticketingberry.exception.custom.InvalidDateException;
 
@@ -43,7 +46,7 @@ public class ConcertServiceTest {
 	
 	private Concert concert;
 	
-	private InConcertDto inConcertDto;
+	private ConcertRequest concertRequest;
 	
 	private Place place;
 	
@@ -53,19 +56,6 @@ public class ConcertServiceTest {
 	
 	@BeforeEach
 	void setUp() {
-		concert = Concert.builder()
-				.id(1L)
-				.place(place)
-				.artist(artist)
-				.build();
-		
-		inConcertDto = InConcertDto.builder()
-				.placeId(1L)
-				.artistId(1L)
-				.openedTicketAt(LocalDateTime.of(2024, FEBRUARY, 1, 20, 00))
-				.performedAt(LocalDateTime.of(2024, FEBRUARY, 25, 17, 00))
-				.build();
-		
 		place = Place.builder()
 				.id(1L)
 				.build();
@@ -74,6 +64,48 @@ public class ConcertServiceTest {
 				.id(1L)
 				.build();
 		
+		concert = Concert.builder()
+				.id(1L)
+				.place(place)
+				.artist(artist)
+				.districts(List.of(District.builder().id(1L).build(),
+				   		   District.builder().id(2L).build()))
+				.title("2024 IU HEREH WORLD TOUR CONCERT ENCORE: THE WINNING")
+				.content("공연 날짜: 2024.09.21(토) ~ 2024.09.22(일)")
+				.openedTicketAt(LocalDateTime.of(2024, AUGUST, 12, 20, 00))
+				.performedAt(LocalDateTime.of(2024, SEPTEMBER, 21, 19, 00))
+				.build();
+		
+		List<SeatRequest> SeatRequests = List.of(
+				SeatRequest.builder()
+				.rowNum(1)
+				.seatNum(1)
+				.build(),
+				SeatRequest.builder()
+				.rowNum(1)
+				.seatNum(2)
+				.build());
+		
+		List<DistrictRequest> DistrictRequests = List.of(
+				DistrictRequest.builder()
+				.districtName("A")
+				.seatRequests(SeatRequests)
+				.build(),
+				DistrictRequest.builder()
+				.districtName("B")
+				.seatRequests(SeatRequests)
+				.build());
+		
+		concertRequest = ConcertRequest.builder()
+			    .placeId(place.getId())
+			    .artistId(artist.getId())
+			    .title("2024 IU HEREH WORLD TOUR CONCERT ENCORE: THE WINNING")
+			    .content("공연 날짜: 2024.09.21(토) ~ 2024.09.22(일)")
+			    .openedTicketAt(LocalDateTime.of(2024, AUGUST, 12, 20, 0))
+			    .performedAt(LocalDateTime.of(2024, SEPTEMBER, 21, 19, 0))
+			    .districtRequests(DistrictRequests)
+			    .build();
+
 		sort = Sort.by(Sort.Order.desc("openedTicketAt"));
 	}
 	
@@ -84,20 +116,20 @@ public class ConcertServiceTest {
 		when(artistRepository.findById(artist.getId())).thenReturn(Optional.of(artist));
 		when(concertRepository.save(any(Concert.class))).thenReturn(concert);
 		
-		Concert result = concertService.create(inConcertDto);
+		Concert result = concertService.create(concertRequest);
 		assertEquals(concert, result);
 	}
 	
 	@Test
 	@DisplayName("공연 생성 실패: 공연이 시작하는 날짜가 공연 예매가 열리는 날짜보다 빠르면 InvalidDateException")
 	void createConcert_whenPerformedAtIsBeforeThanOpenedTicketDate_throwsInvalidDateException() {
-		inConcertDto = InConcertDto.builder()
+		concertRequest = ConcertRequest.builder()
 				.openedTicketAt(LocalDateTime.of(2024, FEBRUARY, 25, 17, 00))
 				.performedAt(LocalDateTime.of(2024, FEBRUARY, 1, 20, 00))
 				.build();
 		
 		InvalidDateException exception
-			= assertThrows(InvalidDateException.class, () -> concertService.update(concert.getId(), inConcertDto));
+			= assertThrows(InvalidDateException.class, () -> concertService.update(concert.getId(), concertRequest));
 		assertEquals("공연이 시작하는 날짜가 공연 예매가 열리는 날짜보다 빠릅니다.", exception.getMessage());
 	}
 	
@@ -175,15 +207,15 @@ public class ConcertServiceTest {
 		when(concertRepository.findById(concert.getId())).thenReturn(Optional.of(concert));
 		when(concertRepository.save(any(Concert.class))).thenReturn(concert);
 		
-		inConcertDto = InConcertDto.builder()
+		concertRequest = ConcertRequest.builder()
 				.placeId(1L)
 				.artistId(1L)
 				.openedTicketAt(LocalDateTime.of(2024, SEPTEMBER, 1, 20, 00))
 				.performedAt(LocalDateTime.of(2024, SEPTEMBER, 18, 18, 00))
 				.build();
 		
-		Concert result = concertService.update(concert.getId(), inConcertDto);
-		assertEquals(inConcertDto.getPerformedAt(), result.getPerformedAt());
+		Concert result = concertService.update(concert.getId(), concertRequest);
+		assertEquals(concertRequest.getPerformedAt(), result.getPerformedAt());
 	}
 	
 	@Test

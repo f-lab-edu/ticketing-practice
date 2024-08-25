@@ -18,7 +18,6 @@ import com.ticketingberry.domain.concert.Concert;
 import com.ticketingberry.domain.concert.ConcertRepository;
 import com.ticketingberry.domain.district.District;
 import com.ticketingberry.domain.district.DistrictRepository;
-import com.ticketingberry.dto.district.InDistrictDto;
 import com.ticketingberry.exception.custom.DataNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,8 +33,6 @@ public class DistrictServiceTest {
 	
 	private District district;
 	
-	private InDistrictDto inDistrictDto;
-	
 	private Concert concert;
 	
 	@BeforeEach
@@ -45,20 +42,9 @@ public class DistrictServiceTest {
 				.concert(concert)
 				.build();
 		
-		inDistrictDto = InDistrictDto.builder()
-				.build();
-		
 		concert = Concert.builder()
 				.id(1L)
 				.build();
-	}
-	
-	@Test
-	@DisplayName("구역 생성 성공")
-	void createDistrict_success() {
-		when(districtRepository.save(any(District.class))).thenReturn(district);
-		District result = districtService.create(inDistrictDto, concert);
-		assertEquals(district, result);
 	}
 	
 	@Test

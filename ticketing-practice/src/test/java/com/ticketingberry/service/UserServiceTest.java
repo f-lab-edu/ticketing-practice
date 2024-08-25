@@ -17,8 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.ticketingberry.domain.user.User;
 import com.ticketingberry.domain.user.UserRepository;
-import com.ticketingberry.dto.user.UpdateUserDto;
-import com.ticketingberry.dto.user.InUserDto;
+import com.ticketingberry.dto.user.UserUpdateRequest;
+import com.ticketingberry.dto.user.UserCreateRequest;
 import com.ticketingberry.exception.custom.DataDuplicatedException;
 import com.ticketingberry.exception.custom.DataNotFoundException;
 import com.ticketingberry.exception.custom.PasswordsUnequalException;
@@ -42,7 +42,9 @@ public class UserServiceTest {
 	
 	private User user;
 	
-	private InUserDto userDto;
+	private UserCreateRequest userCreateRequest;
+	
+	private UserUpdateRequest userUpdateRequest;
 	
 	@BeforeEach
 	void setUp() {
@@ -51,24 +53,30 @@ public class UserServiceTest {
 				.username("testuser")
 				.build();
 		
-		userDto = InUserDto.builder()
+		userCreateRequest = UserCreateRequest.builder()
 				.username("testuser")
 				.password1("testpassword")
 				.password2("testpassword")
-				.build();;
+				.build();
+				
+		userUpdateRequest = UserUpdateRequest.builder()
+				.nickname("닉네임변경")
+				.email("changeEmail@example.com")
+				.phone("01012345678")
+				.build();
 	}
 	
 	@Test
 	@DisplayName("회원 생성 성공")
 	void createUser_success() {
 		// 목 객체의 동작 정의
-		when(userRepository.findByUsername(userDto.getUsername())).thenReturn(Optional.empty());
+		when(userRepository.findByUsername(userCreateRequest.getUsername())).thenReturn(Optional.empty());
 		
 		// 목 객체가 반환할 사용자 설정
 		when(userRepository.save(any(User.class))).thenReturn(user);
 		
 		// 서비스 메서드 호출 및 결과 검증
-		User result = userService.create(userDto);
+		User result = userService.create(userCreateRequest);
 		
 		// 결과가 예상대로인지 검증
 		assertEquals(user, result);
@@ -77,13 +85,13 @@ public class UserServiceTest {
 	@Test
 	@DisplayName("회원 생성: 비밀번호와 비밀번호 확인이 다르면 PasswordsUnequalException 던지기")
 	void createUser_whenPasswordsDoNotMatch_throwsPasswordsUnequalException() {
-		userDto = InUserDto.builder()
+		userCreateRequest = UserCreateRequest.builder()
 				.password1("password")
 				.password2("differentPassword")
 				.build();
 		
 		PasswordsUnequalException exception = assertThrows(PasswordsUnequalException.class, 
-											() -> userService.create(userDto));
+											() -> userService.create(userCreateRequest));
 	
 		assertEquals("비밀번호와 비밀번호 확인이 다릅니다.", exception.getMessage());
 	}
@@ -91,11 +99,11 @@ public class UserServiceTest {
 	@Test
 	@DisplayName("회원 생성: username으로 회원 조회가 된 경우 중복 객체이므로 DataDupliactedException 던지기")
 	void createUser_whenUsernameExists_throwsDataDupliactedException() {
-		when (userRepository.findByUsername(userDto.getUsername()))
+		when (userRepository.findByUsername(userCreateRequest.getUsername()))
 		.thenReturn(Optional.of(User.builder().username("testuser").build()));
 		
 		DataDuplicatedException exception = assertThrows(DataDuplicatedException.class,
-										() -> userService.create(userDto));
+										() -> userService.create(userCreateRequest));
 		
 		assertEquals("username: <testuser>은 이미 존재하는 회원입니다.", exception.getMessage());;
 	}
@@ -153,17 +161,11 @@ public class UserServiceTest {
 		when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 		when(userRepository.save(any(User.class))).thenReturn(user);
 		
-		UpdateUserDto updateUserDto = UpdateUserDto.builder()
-				.nickname("닉네임변경")
-				.email("changeEmail@example.com")
-				.phone("01012345678")
-				.build();;
+		User result = userService.update(1L, userUpdateRequest);
 		
-		User result = userService.update(1L, updateUserDto);
-		
-		assertEquals(result.getNickname(), updateUserDto.getNickname());
-		assertEquals(result.getEmail(), updateUserDto.getEmail());
-		assertEquals(result.getPhone(), updateUserDto.getPhone());
+		assertEquals(result.getNickname(), userUpdateRequest.getNickname());
+		assertEquals(result.getEmail(), userUpdateRequest.getEmail());
+		assertEquals(result.getPhone(), userUpdateRequest.getPhone());
 	}
 	
 	@Test
