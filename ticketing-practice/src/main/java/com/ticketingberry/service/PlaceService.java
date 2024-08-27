@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.ticketingberry.domain.entity.Place;
-import com.ticketingberry.domain.repository.PlaceRepository;
-import com.ticketingberry.dto.PlaceDto;
+import com.ticketingberry.domain.place.Place;
+import com.ticketingberry.domain.place.PlaceRepository;
+import com.ticketingberry.dto.place.PlaceDto;
 import com.ticketingberry.exception.custom.DataNotFoundException;
 
 import jakarta.transaction.Transactional;
@@ -20,7 +20,7 @@ public class PlaceService {
 	// 공연 장소 추가
 	@Transactional
 	public Place create(PlaceDto placeDto) {
-		Place place = Place.of(placeDto);
+		Place place = PlaceDto.newPlace(placeDto);
 		return placeRepository.save(place);
 	}
 	
@@ -30,7 +30,7 @@ public class PlaceService {
 		return placeRepository.findAll();
 	}
 	
-	// 공연 1개 조회
+	// 공연 장소 1개 조회
 	@Transactional
 	public Place findById(Long placeId) {
 		return placeRepository.findById(placeId)

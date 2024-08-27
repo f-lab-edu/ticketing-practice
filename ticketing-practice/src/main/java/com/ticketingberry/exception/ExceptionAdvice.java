@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.ticketingberry.exception.custom.AlreadySelectedSeatException;
 import com.ticketingberry.exception.custom.DataDuplicatedException;
 import com.ticketingberry.exception.custom.DataNotFoundException;
 import com.ticketingberry.exception.custom.InvalidDateException;
@@ -43,5 +44,13 @@ public class ExceptionAdvice {
 	@ResponseBody
 	public ErrorResponse InvalidDateExceptionHandler(InvalidDateException e) {
 		return new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST.value());
+	}
+	
+	// 409(충돌): 서버가 요청을 수행하는 중에 충돌이 발생하였다.
+	@ExceptionHandler(AlreadySelectedSeatException.class)
+	@ResponseStatus(HttpStatus.CONFLICT)
+	@ResponseBody
+	public ErrorResponse AlreadySelectedSeatExceptionHanlder(AlreadySelectedSeatException e) {
+		return new ErrorResponse(e.getMessage(), HttpStatus.CONFLICT.value());
 	}
 }
