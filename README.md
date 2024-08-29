@@ -81,3 +81,11 @@ https://chisel-sleet-47c.notion.site/3e9211b2596e4e02bd79cc41c83443aa?v=e87b5508
 - 하나의 XXXDto를 요청(XXXRequest), 응답(XXXResponse)로 책임 분산
 - DTO에 Entity 생성 정적 팩터리 메서드를 선언하고, Entity에는 정적 팩터리 메서드 제거
 - Reservation에서 Ticket으로 domain 이름 변경
+
+### #11 locust를 활용한 부하테스트 진행, 세부사항 추가 수정
+- locust를 활용한 부하테스트 진행하기
+- Concert 조회수(hits) 기능 누락됐으므로 추가
+- createdAt도 응답 DTO에 추가하기
+- User의 birth 변수명을 bornAt으로 변경하고, LocalDateTime 타입으로 변경
+- User의 gender를 enum 타입으로 변경
+- src/docs/asciidoc/.adoc 에 테스트한 모든 request/response 추가
