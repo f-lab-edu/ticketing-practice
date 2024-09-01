@@ -84,6 +84,7 @@ https://chisel-sleet-47c.notion.site/3e9211b2596e4e02bd79cc41c83443aa?v=e87b5508
 
 ### #11 locust을 활용한 부하테스트 진행, 세부사항 추가 수정
 - locust를 활용한 부하테스트 진행
+![total_requests_per_second_1725198595 295](https://github.com/user-attachments/assets/9f7f8943-0aa5-469e-b571-7d4dd3a21c46)
 - Concert 조회수(hits) 기능 누락됐으므로 추가
 - createdAt, updatedAt도 응답 DTO에 추가하기
 - User의 birth 변수명을 birthAt으로 변경하고, LocalDate 타입으로 변경
