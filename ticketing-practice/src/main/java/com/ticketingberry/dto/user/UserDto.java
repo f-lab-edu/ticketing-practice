@@ -2,6 +2,10 @@ package com.ticketingberry.dto.user;
 
 import static com.ticketingberry.domain.user.UserRole.USER;
 
+import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.ticketingberry.domain.user.Gender;
 import com.ticketingberry.domain.user.UserRole;
 
 import jakarta.validation.constraints.Email;
@@ -35,12 +39,12 @@ public abstract class UserDto {
 	@Pattern(regexp = "^01(?:0|1|[6-9])(\\d{3}|\\d{4})\\d{4}$", message = "유효한 휴대폰 번호를 입력해주세요.")
 	private String phone;
 	
-	@NotNull(message = "생년월일을 입력해주세요.")
-	@Pattern(regexp = "^\\d{8}$", message = "생년월일은 yyyyMMdd 형식으로 입력해주세요.")
-	private String birth;
+	@NotNull(message = "생년월일을 선택해주세요.")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
+	private LocalDate birthAt;
 	
-	@NotNull(message = "성별을 입력해주세요.")
-	private String gender;
+	@NotNull(message = "성별을 선택해주세요.")
+	private Gender gender;
 	
 	@Builder.Default
 	private UserRole role = USER;
