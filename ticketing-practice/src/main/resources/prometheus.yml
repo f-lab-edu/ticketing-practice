@@ -1,0 +1,9 @@
+# Actuator에서 제공하는 메트릭 데이터를 수집하고 저장
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'spring-boot'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['localhost:8080']
