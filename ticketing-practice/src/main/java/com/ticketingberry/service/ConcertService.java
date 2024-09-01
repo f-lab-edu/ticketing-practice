@@ -68,8 +68,10 @@ public class ConcertService {
 	// 공연 1개 조회
 	@Transactional
 	public Concert findById(Long concertId) {
-		return concertRepository.findById(concertId)
+		Concert concert = concertRepository.findById(concertId)
 				.orElseThrow(() -> new DataNotFoundException("공연을 찾을 수 없습니다."));
+		concert.increaseHits();
+		return concert;
 	}
 	
 	// 1개의 장소에 해당하는 공연 리스트 조회
