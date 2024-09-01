@@ -7,8 +7,11 @@ import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.hamcrest.Matchers.*;
 import static java.time.Month.*;
+import static com.ticketingberry.domain.user.Gender.F;
+import static com.ticketingberry.domain.user.Gender.M;
 import static com.ticketingberry.domain.user.UserRole.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -55,25 +58,25 @@ public class TicketControllerTest extends AbstractRestDocsTests {
 		users = List.of(
 					User.builder()
 					.id(1L)
-					.username("apple123")
-					.password("apple123")
-					.nickname("사과")
-					.email("apple123@example.com")
-					.phone("01020000101")
-					.birth("20000101")
-					.gender("F")
+					.username("agi1004")
+					.password("password")
+					.nickname("오렌지")
+					.email("agi1009@naver.com")
+					.phone("01087872963")
+					.birthAt(LocalDate.of(1999, SEPTEMBER, 18))
+					.gender(F)
 					.role(USER)
 					.createdAt(LocalDateTime.now())
 					.build(),
 					User.builder()
 					.id(2L)
-					.username("orange123")
-					.password("orange123")
-					.nickname("오렌지")
-					.email("orange123@example.com")
-					.phone("01019990918")
-					.birth("19990918")
-					.gender("F")
+					.username("apple123")
+					.password("apple123")
+					.nickname("사과")
+					.email("apple123@example.com")
+					.phone("01098765432")
+					.birthAt(LocalDate.of(2002, APRIL, 20))
+					.gender(M)
 					.role(USER)
 					.createdAt(LocalDateTime.now())
 					.build());
@@ -98,6 +101,7 @@ public class TicketControllerTest extends AbstractRestDocsTests {
 				.content("공연 날짜: 2024.09.21(토) ~ 2024.09.22(일)")
 				.openedTicketAt(LocalDateTime.of(2024, AUGUST, 12, 20, 00))
 				.performedAt(LocalDateTime.of(2024, SEPTEMBER, 21, 19, 00))
+				.createdAt(LocalDateTime.now())
 				.build();
 		
 		district = District.builder()
@@ -106,6 +110,7 @@ public class TicketControllerTest extends AbstractRestDocsTests {
 				.seats(List.of(Seat.builder().id(1L).build(),
 							   Seat.builder().id(2L).build()))
 				.districtName("A")
+				.createdAt(LocalDateTime.now())
 				.build();
 		
 		seats = List.of(
@@ -114,12 +119,14 @@ public class TicketControllerTest extends AbstractRestDocsTests {
 					.district(district)
 					.rowNum(1)
 					.seatNum(1)
+					.createdAt(LocalDateTime.now())
 					.build(),
 					Seat.builder()
 					.id(2L)
 					.district(district)
 					.rowNum(2)
 					.seatNum(5)
+					.createdAt(LocalDateTime.now())
 					.build());
 		
 		tickets = List.of(

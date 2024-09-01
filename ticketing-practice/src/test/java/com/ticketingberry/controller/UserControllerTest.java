@@ -7,8 +7,11 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
 import static com.ticketingberry.domain.user.UserRole.*;
+import static com.ticketingberry.domain.user.Gender.*;
+import static java.time.Month.*;
 import static org.hamcrest.Matchers.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -54,34 +57,34 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	void setUp() {
 		user = User.builder()
 				.id(1L)
-				.username("testuser")
-				.password("testpassword")
-				.nickname("테스트")
-				.email("testuser@example.com")
-				.phone("01012345678")
-				.birth("20000101")
-				.gender("F")
+				.username("agi1004")
+				.password("password")
+				.nickname("오렌지")
+				.email("agi1009@naver.com")
+				.phone("01087872963")
+				.birthAt(LocalDate.of(1999, SEPTEMBER, 18))
+				.gender(F)
 				.role(USER)
 				.createdAt(LocalDateTime.now())
 				.build();
 		
 		userCreateRequest = UserCreateRequest.builder()
-				.username("testuser")
-				.password1("testpassword")
-				.password2("testpassword")
-				.nickname("테스트")
-				.email("testuser@example.com")
-				.phone("01012345678")
-				.birth("20000101")
-				.gender("F")
+				.username("agi1004")
+				.password1("password")
+				.password2("password")
+				.nickname("오렌지")
+				.email("agi1009@naver.com")
+				.phone("01087872963")
+				.birthAt(LocalDate.of(1999, SEPTEMBER, 18))
+				.gender(F)
 				.build();
 		
 		userUpdateRequest = UserUpdateRequest.builder()
-				.nickname("테스트")
-				.email("testuser@example.com")
+				.nickname("닉네임")
+				.email("change@example.com")
 				.phone("01012345678")
 				.username(user.getUsername())
-				.birth(user.getBirth())
+				.birthAt(user.getBirthAt())
 				.gender(user.getGender())
 				.build();
 	}
@@ -120,8 +123,8 @@ public class UserControllerTest extends AbstractRestDocsTests {
 				.nickname("테스트")
 				.email("testuser@example.com")
 				.phone("01012345678")
-				.birth("20000101")
-				.gender("F")
+				.birthAt(LocalDate.of(1999, SEPTEMBER, 18))
+				.gender(F)
 				.build();
 		
 		Mockito.doThrow(new PasswordsUnequalException("비밀번호와 비밀번호 확인이 다릅니다."))
@@ -157,10 +160,18 @@ public class UserControllerTest extends AbstractRestDocsTests {
 	@DisplayName("전체 회원 목록 조회")
 	void getAllUsers() throws Exception {
 		List<User> users = List.of(user,
-				User.builder().id(2L).username("testuser2").password("testpassword")
-				.nickname("테스트2").email("testuser2@example.com").phone("01098765432")
-				.birth("20010101").gender("M").role(USER)
-				.createdAt(LocalDateTime.now()).build());
+				User.builder()
+				.id(2L)
+				.username("testuser2")
+				.password("testpassword")
+				.nickname("테스트2")
+				.email("testuser2@example.com")
+				.phone("01098765432")
+				.birthAt(LocalDate.of(2002, APRIL, 20))
+				.gender(M)
+				.role(USER)
+				.createdAt(LocalDateTime.now())
+				.build());
 		
 		// UserService의 Mock 객체에 대해 findAll 메서드 호출 시 반환 값 설정
 		when(userService.findAll()).thenReturn(users);

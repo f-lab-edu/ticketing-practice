@@ -64,6 +64,7 @@ public class SeatControllerTest extends AbstractRestDocsTests {
 				.content("공연 날짜: 2024.09.21(토) ~ 2024.09.22(일)")
 				.openedTicketAt(LocalDateTime.of(2024, AUGUST, 12, 20, 00))
 				.performedAt(LocalDateTime.of(2024, SEPTEMBER, 21, 19, 00))
+				.createdAt(LocalDateTime.now())
 				.build();
 		
 		district = District.builder()
@@ -72,6 +73,7 @@ public class SeatControllerTest extends AbstractRestDocsTests {
 				.seats(List.of(Seat.builder().id(1L).build(),
 							   Seat.builder().id(2L).build()))
 				.districtName("A")
+				.createdAt(LocalDateTime.now())
 				.build();
 		
 		seat = Seat.builder()
@@ -79,6 +81,7 @@ public class SeatControllerTest extends AbstractRestDocsTests {
 				.district(district)
 				.rowNum(1)
 				.seatNum(1)
+				.createdAt(LocalDateTime.now())
 				.build();
 	}
 	
@@ -91,6 +94,7 @@ public class SeatControllerTest extends AbstractRestDocsTests {
 				.district(district)
 				.rowNum(1)
 				.seatNum(2)
+				.createdAt(LocalDateTime.now())
 				.build());
 		
 		when(seatService.findListByDistrictId(district.getId())).thenReturn(seats);

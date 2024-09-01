@@ -77,6 +77,7 @@ public class ConcertControllerTest extends AbstractRestDocsTests {
 				.content("공연 날짜: 2024.09.21(토) ~ 2024.09.22(일)")
 				.openedTicketAt(LocalDateTime.of(2024, AUGUST, 12, 20, 00))
 				.performedAt(LocalDateTime.of(2024, SEPTEMBER, 21, 19, 00))
+				.createdAt(LocalDateTime.now())
 				.build();
 		
 		List<SeatRequest> SeatRequests = List.of(
@@ -177,6 +178,7 @@ public class ConcertControllerTest extends AbstractRestDocsTests {
 			    .content("공연 시간 정보: 2024.08.17(토) 오후 6시, 2024.08.28(일) 오후 6시")
 			    .openedTicketAt(LocalDateTime.of(2024, JUNE, 10, 12, 0))
 			    .performedAt(LocalDateTime.of(2024, AUGUST, 17, 18, 0))
+			    .createdAt(LocalDateTime.now())
 			    .build());
 		
 		when(concertService.findAll()).thenReturn(concerts);
@@ -200,6 +202,8 @@ public class ConcertControllerTest extends AbstractRestDocsTests {
 	@Test
 	@DisplayName("공연 1개 조회")
 	void getConcert() throws Exception {
+		concert.increaseHits();
+		
 		when(concertService.findById(concert.getId())).thenReturn(concert);
 		
 		MvcResult result = mockMvc.perform(get("/concerts/{concertId}", concert.getId())
@@ -246,6 +250,7 @@ public class ConcertControllerTest extends AbstractRestDocsTests {
 			    .content("공연 시간 정보: 2023.06.17(토) 오후 8시, 2023.06.18(일) 오후 8시")
 			    .openedTicketAt(LocalDateTime.of(2023, MAY, 10, 20, 0))
 			    .performedAt(LocalDateTime.of(2023, JUNE, 17, 20, 0))
+			    .createdAt(LocalDateTime.now())
 			    .build());
 		
 		when(concertService.findListByPlaceId(place.getId())).thenReturn(concerts);
@@ -296,6 +301,7 @@ public class ConcertControllerTest extends AbstractRestDocsTests {
 			    .content("공연 시간 정보: 2023.09.23(토) 오후 6시, 2023.09.24(일) 오후 5시")
 			    .openedTicketAt(LocalDateTime.of(2023, AUGUST, 15, 20, 0))
 			    .performedAt(LocalDateTime.of(2023, SEPTEMBER, 23, 18, 0))
+			    .createdAt(LocalDateTime.now())
 			    .build());
 		
 		when(concertService.findListByArtistId(artist.getId())).thenReturn(concerts);
