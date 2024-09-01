@@ -18,6 +18,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
@@ -39,6 +40,7 @@ public class District {		// 구역 테이블
 	private long id;		// 구역 고유 id (1부터 자동 증가)
 	
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "concert_id")
 	private Concert concert;		// 구역이 속한 공연
 	
 	@OneToMany(mappedBy = "district", cascade = CascadeType.ALL, orphanRemoval = true)

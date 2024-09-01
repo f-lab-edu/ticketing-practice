@@ -15,6 +15,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,9 +35,11 @@ public class ConcertWishlist {	// 콘서트(공연) 찜 테이블
 	private long id;		//  공연 찜 고유 id (1부터 자동 증가)
 	
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "concert_id")
 	private Concert concert;	// 찜을 해놓은 공연
 	
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id")
 	private User user;			// 공연 찜을 소유하고 있는 회원
 	
 	@CreationTimestamp

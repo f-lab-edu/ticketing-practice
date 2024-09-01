@@ -21,6 +21,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -43,9 +44,11 @@ public class Concert {	// 콘서트(공연) 테이블
 	private long id;		// 공연 고유 id (1부터 자동 증가)
 	
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "place_id")
 	private Place place;		// 공연이 열리는 장소
 	
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "artist_id")
 	private Artist artist;	// 공연을 진행하는 아티스트
 	
 	// mappedBy = "concert": District 엔티티에서 이 관계의 소유자가 concert 필드임을 지정
@@ -59,6 +62,7 @@ public class Concert {	// 콘서트(공연) 테이블
 	private List<District> districts = new ArrayList<>();	// 공연에 속하는 구역 리스트
 	
 	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "image_id")
 	private Image image;		// 공연 대표 이미지
 	
 	@NotNull
@@ -89,5 +93,9 @@ public class Concert {	// 콘서트(공연) 테이블
 		this.content = inConcertDto.getContent();
 		this.openedTicketAt = inConcertDto.getOpenedTicketAt();
 		this.performedAt = inConcertDto.getPerformedAt();
+	}
+	
+	public void increaseHits() {	// 조회수 증가
+		this.hits++;
 	}
 }

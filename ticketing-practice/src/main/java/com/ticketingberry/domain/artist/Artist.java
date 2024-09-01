@@ -14,6 +14,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -34,6 +35,7 @@ public class Artist {	// 아티스트 테이블
 	private long id;	// 아티스트 고유 id (1부터 자동 증가)
 	
 	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "image_id")
 	private Image image;	// 아티스트 대표 이미지
 
 	@NotNull

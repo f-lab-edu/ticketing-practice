@@ -16,6 +16,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
@@ -37,12 +38,15 @@ public class Article {	// 게시글 테이블
 	private long id;		// 게시글 고유 id (1부터 자동 증가)
 	
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "board_id")
 	private Board board;		// 게시글이 속한 게시판
 	
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id")
 	private User user;		// 게시글을 작성한 회원
 	
 	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "image_id")
 	private Image image;		// 게시글에 첨부된 이미지
 	
 	@NotNull
