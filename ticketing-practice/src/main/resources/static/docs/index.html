@@ -549,19 +549,19 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /users HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Content-Length: 255
+Content-Length: 247
 Host: localhost:8080
 
 {
-  "username" : "testuser",
-  "nickname" : "테스트",
-  "email" : "testuser@example.com",
-  "phone" : "01012345678",
-  "birth" : "20000101",
+  "username" : "agi1004",
+  "nickname" : "오렌지",
+  "email" : "agi1009@naver.com",
+  "phone" : "01087872963",
+  "birthAt" : "1999.09.18",
   "gender" : "F",
   "role" : "USER",
-  "password1" : "testpassword",
-  "password2" : "testpassword"
+  "password1" : "password",
+  "password2" : "password"
 }</code></pre>
 </div>
 </div>
@@ -572,16 +572,18 @@ Host: localhost:8080
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
 Content-Type: application/json;charset=UTF-8
-Content-Length: 189
+Content-Length: 252
 
 {
-  "username" : "testuser",
-  "nickname" : "테스트",
-  "email" : "testuser@example.com",
-  "phone" : "01012345678",
-  "birth" : "20000101",
+  "username" : "agi1004",
+  "nickname" : "오렌지",
+  "email" : "agi1009@naver.com",
+  "phone" : "01087872963",
+  "birthAt" : "1999.09.18",
   "gender" : "F",
-  "role" : "USER"
+  "role" : "USER",
+  "createdAt" : "2024.08.31 19:22:24",
+  "updatedAt" : null
 }</code></pre>
 </div>
 </div>
@@ -607,24 +609,28 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
-Content-Length: 387
+Content-Length: 517
 
 [ {
-  "username" : "testuser",
-  "nickname" : "테스트",
-  "email" : "testuser@example.com",
-  "phone" : "01012345678",
-  "birth" : "20000101",
+  "username" : "agi1004",
+  "nickname" : "오렌지",
+  "email" : "agi1009@naver.com",
+  "phone" : "01087872963",
+  "birthAt" : "1999.09.18",
   "gender" : "F",
-  "role" : "USER"
+  "role" : "USER",
+  "createdAt" : "2024.08.31 19:22:24",
+  "updatedAt" : null
 }, {
   "username" : "testuser2",
   "nickname" : "테스트2",
   "email" : "testuser2@example.com",
   "phone" : "01098765432",
-  "birth" : "20010101",
+  "birthAt" : "2002.04.20",
   "gender" : "M",
-  "role" : "USER"
+  "role" : "USER",
+  "createdAt" : "2024.08.31 19:22:24",
+  "updatedAt" : null
 } ]</code></pre>
 </div>
 </div>
@@ -650,16 +656,18 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
-Content-Length: 189
+Content-Length: 252
 
 {
-  "username" : "testuser",
-  "nickname" : "테스트",
-  "email" : "testuser@example.com",
-  "phone" : "01012345678",
-  "birth" : "20000101",
+  "username" : "agi1004",
+  "nickname" : "오렌지",
+  "email" : "agi1009@naver.com",
+  "phone" : "01087872963",
+  "birthAt" : "1999.09.18",
   "gender" : "F",
-  "role" : "USER"
+  "role" : "USER",
+  "createdAt" : "2024.08.31 19:22:24",
+  "updatedAt" : null
 }</code></pre>
 </div>
 </div>
@@ -675,15 +683,15 @@ Content-Length: 189
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">PUT /users/1 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Content-Length: 189
+Content-Length: 190
 Host: localhost:8080
 
 {
-  "username" : "testuser",
-  "nickname" : "테스트",
-  "email" : "testuser@example.com",
+  "username" : "agi1004",
+  "nickname" : "닉네임",
+  "email" : "change@example.com",
   "phone" : "01012345678",
-  "birth" : "20000101",
+  "birthAt" : "1999.09.18",
   "gender" : "F",
   "role" : "USER"
 }</code></pre>
@@ -696,16 +704,18 @@ Host: localhost:8080
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
-Content-Length: 189
+Content-Length: 253
 
 {
-  "username" : "testuser",
-  "nickname" : "테스트",
-  "email" : "testuser@example.com",
+  "username" : "agi1004",
+  "nickname" : "닉네임",
+  "email" : "change@example.com",
   "phone" : "01012345678",
-  "birth" : "20000101",
+  "birthAt" : "1999.09.18",
   "gender" : "F",
-  "role" : "USER"
+  "role" : "USER",
+  "createdAt" : "2024.08.31 19:22:24",
+  "updatedAt" : null
 }</code></pre>
 </div>
 </div>
@@ -731,16 +741,18 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
-Content-Length: 189
+Content-Length: 252
 
 {
-  "username" : "testuser",
-  "nickname" : "테스트",
-  "email" : "testuser@example.com",
-  "phone" : "01012345678",
-  "birth" : "20000101",
+  "username" : "agi1004",
+  "nickname" : "오렌지",
+  "email" : "agi1009@naver.com",
+  "phone" : "01087872963",
+  "birthAt" : "1999.09.18",
   "gender" : "F",
-  "role" : "USER"
+  "role" : "USER",
+  "createdAt" : "2024.08.31 19:22:24",
+  "updatedAt" : null
 }</code></pre>
 </div>
 </div>
