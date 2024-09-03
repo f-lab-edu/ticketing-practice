@@ -17,8 +17,9 @@
 - JaCoCo를 사용하여 테스트 커버리지 80% 이상을 달성하여 코드 품질과 안정성을 보장
 - Spring Validation을 활용해 데이터 유효성 검사 및 예외 처리를 구현하여 API 안정성을 강화
 - 데이터베이스 작업에서 예외 처리와 트랜잭션 관리를 통해 데이터 무결성을 유지하고, Spring Security로 보안을 강화
-- 객체 그래프가 순환 형태라면 Proxy 객체로 인해 발생하는 Entity 직렬화 문제를 DTO로 Response하도록 변경하여 해결. 또한, DTO로 Response하면 Entity의 중요한 필드 노출을 숨길 수 있어 보안을 더욱 강화
-
+- Locust를 활용한 부하 테스트로 500명의 트래픽을 시뮬레이션한 결과, 요청 처리 시간이 과도하게 오래 걸림을 확인하고, 성능 최적화를 위해 테이블 풀 스캔에서 인덱스 풀 스캔으로 개선 방안을 마련
+- JPA의 N + 1 문제를 fetch join으로 해결하여 성능을 크게 개선
+  
 ## ERD 
 ![티켓팅 연습 웹 ERD](https://github.com/user-attachments/assets/7817fa2b-f31d-4095-9bd0-83e852542dce)
 
