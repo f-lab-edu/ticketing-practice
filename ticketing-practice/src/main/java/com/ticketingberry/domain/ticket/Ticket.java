@@ -15,6 +15,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
@@ -36,9 +37,11 @@ public class Ticket {	// 티켓 테이블
 	private long id;		//  티켓 고유 id (1부터 자동 증가)
 	
 	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "seat_id")
 	private Seat seat;			// 티켓 예매를 한 좌석
 	
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id")
 	private User user;		// 티켓 예매를 한 회원
 	
 	@NotNull

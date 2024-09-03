@@ -32,7 +32,7 @@ public class UserCreateRequest extends UserDto {
 				.nickname(userCreateRequest.getNickname())
 				.email(userCreateRequest.getEmail())
 				.phone(userCreateRequest.getPhone())
-				.birth(userCreateRequest.getBirth())
+				.birthAt(userCreateRequest.getBirthAt())
 				.gender(userCreateRequest.getGender())
 				.role(userCreateRequest.getRole())
 				.build();

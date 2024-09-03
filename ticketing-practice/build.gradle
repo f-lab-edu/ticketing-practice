@@ -20,6 +20,7 @@ java {
 
 repositories {
 	mavenCentral()
+	gradlePluginPortal()
 }
 
 configurations {
@@ -51,6 +52,8 @@ dependencies {
 	// (4) MockMvc를 사용하여 테스트할 예정이기 때문에 spring-resetdocs-mockmvc도 dependencies에 추가해준다.
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 	testImplementation 'org.mockito:mockito-core:4.0.0'
+	// Actuator를 사용하여 애플리케이션의 다양한 상태 정보와 메트릭을 노출
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 ext {

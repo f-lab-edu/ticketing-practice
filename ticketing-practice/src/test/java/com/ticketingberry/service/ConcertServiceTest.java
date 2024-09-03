@@ -148,6 +148,7 @@ public class ConcertServiceTest {
 		when(concertRepository.findById(concert.getId())).thenReturn(Optional.of(concert));
 		Concert result = concertService.findById(concert.getId());
 		assertEquals(concert, result);
+		assertEquals(concert.getHits(), result.getHits());
 	}
 	
 	@Test

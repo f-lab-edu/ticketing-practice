@@ -1,5 +1,6 @@
 package com.ticketingberry.domain.user;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -16,6 +17,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -41,6 +43,7 @@ public class User {		// 회원 테이블
 	// @XXXOne(@ManyToOne, @OneToOne)은 기본값이 즉시 로딩 
 	// @XXXMany(@OneToMany, @ManyToMany)는 기본값이 지연 로딩 
 	@OneToOne(fetch = FetchType.LAZY)	// 지연 로딩하도록 설정
+	@JoinColumn(name = "image_id")
 	private Image image;		// 회원 프로필 이미지
 	
 	@NotNull
@@ -63,17 +66,17 @@ public class User {		// 회원 테이블
 	private String phone;			// 회원 휴대폰 번호
 	
 	@NotNull
-	@Column(length = 10)
-	private String birth;			// 회원 생년월일
+	private LocalDate birthAt;	// 회원 생년월일
 	
 	@NotNull
 	@Column(length = 5)
-	private String gender;			// 회원 성별
+	@Enumerated(EnumType.STRING)
+	private Gender gender;			// 회원 성별
 	
 	@NotNull
 	@Column(length = 20)
 	@Enumerated(EnumType.STRING)
-	private UserRole role;			// 회원 역할
+	private UserRole role;			// 회원 권한
 	
 	@CreationTimestamp					// default값: 현재 시간
 	private LocalDateTime createdAt;	// 회원 객체 생성 시간
